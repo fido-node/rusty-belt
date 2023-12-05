@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package rusty.belt;
+
+message Request {
+  string segment_name = 1;
+  oneof Context {
+    Tmux tmux = 2;
+  }
+}
+
+  message Tmux {
+    string session_name = 1;
+    string pwd = 2;
+  }
+
+message Response {
+  oneof ClientResponse {
+    CliClientResponse cli = 1;
+  }
+}
+
+message CliClientResponse {
+  repeated SegmentValue values = 1;
+}
+
+message SegmentValue {
+  oneof Segment  {
+    CPU cpu = 1;
+    Disk disk = 2;
+    LoadAverage load_average = 3;
+    Mem memory = 4;
+    MemPercent memory_percent = 5;
+    TmuxSessionName tmux_session_name = 6;
+    ShellExecutionResult  shell_result = 7;
+    Swap swap = 8;
+    SwapPercent swap_percent = 9;
+    ConnectedVPNs connected_vpns = 10;
+  }
+}
+
+message CPU {
+  float consumption = 1;
+}
+
+message Disk {
+  string mount_point = 1;
+  string device_path = 2;
+  uint64 available_space_b = 3;
+  uint64 total_space_b = 4;
+}
+
+message LoadAverage {
+  double one = 1;
+  double five = 2;
+  double fifteen = 3;
+}
+
+message Mem {
+  uint64 total = 1;
+  uint64 available = 2;
+  uint64 used = 3;
+}
+
+message MemPercent {
+  uint64 used = 1;
+}
+
+message TmuxSessionName {
+  string session_name = 1;
+}
+
+message Swap {
+  uint64 total = 1;
+  uint64 used = 2;
+}
+
+message SwapPercent {
+  uint64 used = 1;
+}
+
+message ShellExecutionResult {
+  string std_out = 1;
+}
+
+
+message ConnectedVPNs {
+  repeated string aliases = 1;
+}

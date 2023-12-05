@@ -1,0 +1,31 @@
+---
+server:
+  update_interval: 2
+segments:
+  - name: left
+    fg_palet:
+      - f5e0dc
+      - f5c2e7
+      - cba6f7
+      - eba0ac
+      - f9e2af
+      - a6e3a1
+      - 94e2d5
+      - 89dceb
+      - 89b4fa
+      - b4befe
+    parts:
+      - type: session_name
+      - type: vpn
+        names:
+          - substring_matcher: "10.154.1."
+            name: "prod"
+          - substring_matcher: "10.154.154."
+            name: "dev"
+      - type: mem_percent
+      - type: cpu
+  - name: right
+    parts:
+      - type: shell
+        use_pwd: true
+        cmd: gitmux -cfg ~/.config/tmux/gitmux.yaml

@@ -1,0 +1,39 @@
+---
+server:
+  update_interval: 2
+segments:
+  - name: left
+    fg_palet:
+      - f5e0dc
+      - f5c2e7
+      - cba6f7
+      - eba0ac
+      - f9e2af
+      - a6e3a1
+      - 94e2d5
+      - 89dceb
+      - 89b4fa
+      - b4befe
+    parts:
+      - type: session_name
+      - type: vpn
+        names:
+          - substring_matcher: "10.154.1."
+            name: "prod"
+          - substring_matcher: "10.154.154."
+            name: "dev"
+      - type: mem
+      - type: mem_percent
+      - type: cpu
+      - type: load_average
+      - type: swap
+      - type: swap_percent
+      - type: disk
+        dev: /dev/mapper/luks-7a504a5c-d5f0-4175-95b6-3a97c15a21ce
+      - type: shell
+        cmd: free -m -h | awk '/Mem/{printf $3"/"$2}'
+  - name: right
+    parts:
+      - type: shell
+        use_pwd: true
+        cmd: gitmux -cfg ~/.config/tmux/gitmux.yaml

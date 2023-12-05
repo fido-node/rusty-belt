@@ -5,7 +5,8 @@ use crate::{
     state::rehydrator::CacheKey,
 };
 
-
+#[cfg(test)]
+use mockall::automock;
 
 use super::{CacheSnapshot, Context, Model};
 
@@ -90,6 +91,8 @@ impl Model for Shell {
 
 #[cfg(test)]
 mod shell_tests {
+    use mockall::predicate::eq;
+
     use crate::model::tests::generate_sample_context;
 
     use super::*;

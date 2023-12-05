@@ -288,7 +288,7 @@ pub mod parse {
         #[test]
         fn parse_example_config() {
             let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-            d.push("config.yaml");
+            d.push("examples/config.yaml");
             let app_config: AppConfig = parse_config(&d);
             // Define the path to the example YAML configuration file
 

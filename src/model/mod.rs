@@ -2,11 +2,9 @@ mod cpu;
 mod disk;
 mod load_average;
 mod mem;
-mod mem_percent;
 mod session;
 mod shell;
 mod swap;
-mod swap_percent;
 mod vpn;
 
 use crate::{
@@ -14,57 +12,18 @@ use crate::{
     protocol::rusty::belt::segment_value,
     state::rehydrator::{CacheKey, CacheSnapshot},
 };
-use core::fmt;
-use std::{
-    fmt::{Debug, Display},
-    str::FromStr,
-};
+use std::fmt::Debug;
 
 use self::{
     cpu::CPU,
     disk::Disk,
     load_average::LoadAverage,
     mem::Mem,
-    mem_percent::MemPercent,
     session::Session,
     shell::{DefaultExecutor, Shell},
     swap::Swap,
-    swap_percent::SwapPercent,
     vpn::Vpn,
 };
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum StateSegment {
-    SessionName,
-    Vpn,
-    Disk,
-    Shell,
-}
-
-impl FromStr for StateSegment {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "SessionName" => Ok(StateSegment::SessionName),
-            "VPN" => Ok(StateSegment::Vpn),
-            "Disk" => Ok(StateSegment::Disk),
-            "Shell" => Ok(StateSegment::Shell),
-            &_ => Err("Go away".to_string()),
-        }
-    }
-}
-
-impl Display for StateSegment {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            StateSegment::SessionName => write!(f, "{}", "SessionName"),
-            StateSegment::Vpn => write!(f, "{}", "VPN"),
-            StateSegment::Disk => write!(f, "{}", "Disk"),
-            StateSegment::Shell => write!(f, "{}", "Shell"),
-        }
-    }
-}
 
 pub trait Model: Debug + Send + 'static {
     fn get_state(&self, context: &Context) -> segment_value::Segment;
@@ -77,20 +36,18 @@ pub struct ModelHelper {}
 impl ModelHelper {
     fn new(part: &Part) -> Option<Box<dyn Model>> {
         match part {
-            Part::Disk(dev) => Some(Box::new(Disk::new(dev.to_string()))),
-            Part::Session => Some(Box::new(Session::new())),
-            Part::ShellCommand(cmd, use_pwd) => Some(Box::new(Shell::new(
+            Part::Disk(_, dev) => Some(Box::new(Disk::new(dev.to_string()))),
+            Part::Session(_) => Some(Box::new(Session::new())),
+            Part::ShellCommand(_, cmd, use_pwd) => Some(Box::new(Shell::new(
                 cmd.to_string(),
                 *use_pwd,
                 DefaultExecutor::default(),
             ))),
-            Part::CPU => Some(Box::new(CPU::new())),
-            Part::Memory => Some(Box::new(Mem::new())),
-            Part::MemoryPercents => Some(Box::new(MemPercent::new())),
-            Part::Swap => Some(Box::new(Swap::new())),
-            Part::SwapPercents => Some(Box::new(SwapPercent::new())),
-            Part::LoadAverage => Some(Box::new(LoadAverage::new())),
-            Part::Vpn(vpns) => Some(Box::new(Vpn::new(vpns))),
+            Part::CPU(_) => Some(Box::new(CPU::new())),
+            Part::Memory(_) => Some(Box::new(Mem::new())),
+            Part::Swap(_) => Some(Box::new(Swap::new())),
+            Part::LoadAverage(_) => Some(Box::new(LoadAverage::new())),
+            Part::Vpn(_, vpns) => Some(Box::new(Vpn::new(vpns))),
         }
     }
 

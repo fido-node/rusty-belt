@@ -19,8 +19,10 @@ pub fn build_cli_response(
     let mut cli_client_resposnse = belt::CliClientResponse::default();
     cli_client_resposnse.values = model_states
         .iter()
-        .map(|s| {
+        .enumerate()
+        .map(|(id, s)| {
             let mut value = SegmentValue::default();
+            value.id = id as u64;
             value.segment = Some(s.clone());
             value
         })

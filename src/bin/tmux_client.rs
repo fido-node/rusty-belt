@@ -2,6 +2,7 @@ use clap::Parser;
 use rusty_belt::args::CliArgs;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
+use rusty_belt::fs::get_config_path;
 use rusty_belt::io::cli_client::CliClient;
 use rusty_belt::protocol::rusty::belt::{self};
 use rusty_belt::render::render_response;
@@ -15,17 +16,25 @@ use std::error::Error;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let args = CliArgs::parse();
+
+    let config_folder = get_config_path();
+
+    let mut config_file = PathBuf::from(config_folder.clone());
+    config_file.push("config.yaml");
+
+    let mut log_config_file = PathBuf::from(config_folder.clone());
+    log_config_file.push("log4rs.yaml");
+
     let path_to_config = if let Some(path) = args.config_path {
         PathBuf::from(path)
     } else {
-        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        d.push("./config.yaml");
-        d
+        config_file
     };
 
     log4rs::init_file(
         args.log_config_path
-            .unwrap_or("/home/michey/Projects/personal/rusty-belt/log4rs.yaml".to_string()),
+            .map(|cp| PathBuf::from(cp))
+            .unwrap_or(log_config_file),
         Default::default(),
     )
     .unwrap();

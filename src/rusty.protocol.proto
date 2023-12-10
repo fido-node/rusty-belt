@@ -25,17 +25,16 @@ message CliClientResponse {
 }
 
 message SegmentValue {
+  uint64 id = 1;
   oneof Segment  {
-    CPU cpu = 1;
-    Disk disk = 2;
-    LoadAverage load_average = 3;
-    Mem memory = 4;
-    MemPercent memory_percent = 5;
+    CPU cpu = 2;
+    Disk disk = 3;
+    LoadAverage load_average = 4;
+    Mem memory = 5;
     TmuxSessionName tmux_session_name = 6;
     ShellExecutionResult  shell_result = 7;
     Swap swap = 8;
-    SwapPercent swap_percent = 9;
-    ConnectedVPNs connected_vpns = 10;
+    ConnectedVPNs connected_vpns = 9;
   }
 }
 
@@ -60,10 +59,7 @@ message Mem {
   uint64 total = 1;
   uint64 available = 2;
   uint64 used = 3;
-}
-
-message MemPercent {
-  uint64 used = 1;
+  uint64 used_percents = 4;
 }
 
 message TmuxSessionName {
@@ -73,14 +69,11 @@ message TmuxSessionName {
 message Swap {
   uint64 total = 1;
   uint64 used = 2;
-}
-
-message SwapPercent {
-  uint64 used = 1;
+  uint64 used_percents = 3;
 }
 
 message ShellExecutionResult {
-  string std_out = 1;
+  string stdout = 1;
 }
 
 

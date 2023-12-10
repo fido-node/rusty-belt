@@ -2,16 +2,14 @@
 name = "rusty-belt"
 version = "0.0.1"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-# [[bin]]
-# name = "tmux-client"
-# src = "src/bin/rusty-belt-server.rs"
-# [[bin]]
-# name = "rusty-belt-server"
-# src = "src/bin/tmux-client.rs"
-
+readme = "README.md"
+repository = "https://github.com/fido-node/rusty-belt"
+license-file = "LICENSE"
+authors = ["Aleksandr Mikhailov <iam@fidonode.me>"]
+description = "Application for collecting system information. Now you can show it in tmux status"
+keywords = ["cli", "tmux", "status"]
+categories = ["command-line-utilities"]
+include = ["/src", "README.md", "/examples", "LICENSE"]
 
 [dependencies]
 clap = { version = "4.4.8", features = ["derive", "env", "unicode"] }
@@ -30,6 +28,7 @@ log4rs = "1.2.0"
 humansize = { version = "2.1.3", features = ["impl_style"] }
 lazy_static = "1.4.0"
 mockall = "0.11.4"
+handlebars = "4.5.0"
 
 [build-dependencies]
 prost-build = "0.12"

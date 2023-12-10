@@ -2,13 +2,13 @@ use clap::Parser;
 use log::debug;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
+use rusty_belt::fs::get_config_path;
 use rusty_belt::model::{Model, ModelHelper};
 
 use rusty_belt::args::ServerArgs;
 use rusty_belt::io::server::Server;
 use rusty_belt::state::rehydrator::Rehydrator;
 use rusty_belt::state::State;
-
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -17,16 +17,24 @@ use std::sync::Arc;
 async fn main() {
     let args = ServerArgs::parse();
 
+    let config_folder = get_config_path();
+
+    let mut config_file = PathBuf::from(config_folder.clone());
+    config_file.push("config.yaml");
+
+    let mut log_config_file = PathBuf::from(config_folder.clone());
+    log_config_file.push("log4rs.yaml");
+
     let path_to_config = if let Some(path) = args.config_path {
         PathBuf::from(path)
     } else {
-        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        d.push("./config.yaml");
-        d
+        config_file
     };
 
     log4rs::init_file(
-        args.log_config_path.unwrap_or("".to_string()),
+        args.log_config_path
+            .map(|cp| PathBuf::from(cp))
+            .unwrap_or(log_config_file),
         Default::default(),
     )
     .unwrap();

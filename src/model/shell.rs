@@ -13,7 +13,7 @@ use super::{CacheSnapshot, Context, Model};
 // Define a trait to represent the external command execution
 #[cfg_attr(test, automock)]
 pub trait CommandExecutor: Debug + Send + 'static {
-    fn execute(&self, cmd: &String, current_directory: Option<String>) -> String;
+    fn execute(&self, cmd: &str, current_directory: Option<String>) -> String;
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +27,7 @@ impl DefaultExecutor {
 // Implement the trait for the actual Command struct
 
 impl CommandExecutor for DefaultExecutor {
-    fn execute(&self, cmd: &String, current_directory: Option<String>) -> String {
+    fn execute(&self, cmd: &str, current_directory: Option<String>) -> String {
         let command = Command::new("sh")
             .arg("-c")
             .arg(cmd)
@@ -76,7 +76,7 @@ impl Model for Shell {
         };
 
         let mut result = belt::ShellExecutionResult::default();
-        result.std_out = cmd_result.unwrap_or("".to_string());
+        result.stdout = cmd_result.unwrap_or("".to_string());
         segment_value::Segment::ShellResult(result)
     }
 
@@ -123,7 +123,7 @@ mod shell_tests {
         assert_eq!(
             result,
             segment_value::Segment::ShellResult(belt::ShellExecutionResult {
-                std_out: "hello".to_string(),
+                stdout: "hello".to_string(),
                 ..Default::default()
             })
         );

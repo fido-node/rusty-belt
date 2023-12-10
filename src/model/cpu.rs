@@ -45,7 +45,7 @@ impl Model for CPU {
 
 #[cfg(test)]
 mod tests {
-    use crate::{model::tests::create_cache_snapshot_with_resources};
+    use crate::model::tests::create_cache_snapshot_with_resources;
 
     use super::*;
 

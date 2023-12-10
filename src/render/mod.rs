@@ -1,43 +1,52 @@
+pub mod templater;
+pub mod view;
+
 use crate::{
     config,
+    config::GetTemplate,
     protocol::rusty::belt::{self, segment_value::Segment},
+    render::templater::Templater,
 };
-use humansize::{FormatSize, FormatSizeOptions, WINDOWS};
 
 use lazy_static::lazy_static;
 
+use self::view::representation::{Disk, Mem, Session, Shell, Swap, CPU, LA, VPN, *};
+
 lazy_static! {
-    static ref CUSTOM_FORMAT: FormatSizeOptions =
-        FormatSizeOptions::from(WINDOWS).space_after_value(false);
+    static ref TEMPLATER: Templater = Templater::default();
 }
 
 pub fn render_response(response: belt::Response, config: &config::Segment) -> String {
     let default_color = "default".to_string();
     let mut result = Vec::new();
     let mut fg_color_palet = config.fg_palet.iter().cycle();
+    let segments = &config.parts;
 
     if let Some(r) = response.client_response {
         match r {
             belt::response::ClientResponse::Cli(cli) => {
                 for opt_segment in cli.values.iter() {
+                    let segment_id = opt_segment.id as usize;
+
                     let some_result = if let Some(segment_value) = &opt_segment.segment {
-                        match segment_value {
-                            Segment::ConnectedVpns(vpns) => render_vpn(vpns),
-                            Segment::Cpu(cpu) => render_cpu(cpu),
-                            Segment::Disk(disk) => render_disk(disk),
-                            Segment::LoadAverage(la) => render_load_average(la),
-                            Segment::Memory(mem) => render_memory(mem),
-                            Segment::MemoryPercent(mem_percents) => {
-                                render_memory_percents(mem_percents)
+                        if let Some(part) = segments.get(segment_id) {
+                            let template = &part.template();
+                            match segment_value {
+                                Segment::ConnectedVpns(vpns) => render_vpn(vpns, template),
+                                Segment::Cpu(cpu) => render_cpu(cpu, template),
+                                Segment::Disk(disk) => render_disk(disk, template),
+                                Segment::LoadAverage(la) => render_load_average(la, template),
+                                Segment::Memory(mem) => render_memory(mem, template),
+                                Segment::ShellResult(shell_reuslt) => {
+                                    render_shell_result(shell_reuslt, template)
+                                }
+                                Segment::Swap(swap) => render_swap(swap, template),
+                                Segment::TmuxSessionName(session_name) => {
+                                    render_session_name(session_name, template)
+                                }
                             }
-                            Segment::ShellResult(shell_reuslt) => render_shell_result(shell_reuslt),
-                            Segment::Swap(swap) => render_swap(swap),
-                            Segment::SwapPercent(swap_percents) => {
-                                render_swap_percents(swap_percents)
-                            }
-                            Segment::TmuxSessionName(session_name) => {
-                                render_session_name(session_name)
-                            }
+                        } else {
+                            None
                         }
                     } else {
                         None
@@ -56,63 +65,69 @@ pub fn render_response(response: belt::Response, config: &config::Segment) -> St
     result.join(" ")
 }
 
-fn render_session_name(session_name: &belt::TmuxSessionName) -> Option<String> {
-    Some(format!("{}", &session_name.session_name))
+fn render_session_name(session_name: &belt::TmuxSessionName, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &Session::from(session_name))
+            .unwrap(),
+    )
 }
 
-fn render_swap_percents(swap_percents: &belt::SwapPercent) -> Option<String> {
-    Some(format!("Swap: {:.0}%", swap_percents.used))
+fn render_swap(swap: &belt::Swap, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &Swap::from(swap))
+            .unwrap(),
+    )
 }
 
-fn render_swap(swap: &belt::Swap) -> Option<String> {
-    Some(format!(
-        "Swap: {}/{}",
-        swap.total.format_size(*CUSTOM_FORMAT),
-        swap.used.format_size(*CUSTOM_FORMAT)
-    ))
+fn render_shell_result(
+    shell_reuslt: &belt::ShellExecutionResult,
+    template_str: &str,
+) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &Shell::from(shell_reuslt))
+            .unwrap(),
+    )
 }
 
-fn render_shell_result(shell_reuslt: &belt::ShellExecutionResult) -> Option<String> {
-    Some(format!("{}", shell_reuslt.std_out))
+fn render_memory(mem: &belt::Mem, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &Mem::from(mem))
+            .unwrap(),
+    )
 }
 
-fn render_memory_percents(mem_percents: &belt::MemPercent) -> Option<String> {
-    Some(format!("Mem: {:.0}%", mem_percents.used))
+fn render_load_average(la: &belt::LoadAverage, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &LA::from(la))
+            .unwrap(),
+    )
 }
 
-fn render_memory(mem: &belt::Mem) -> Option<String> {
-    Some(format!(
-        "Mem: {}/{}/{}",
-        mem.total.format_size(*CUSTOM_FORMAT),
-        mem.available.format_size(*CUSTOM_FORMAT),
-        mem.used.format_size(*CUSTOM_FORMAT)
-    ))
+fn render_disk(disk: &belt::Disk, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &Disk::from(disk))
+            .unwrap(),
+    )
 }
 
-fn render_load_average(la: &belt::LoadAverage) -> Option<String> {
-    Some(format!(
-        "LA: {:.2}/{:.2}/{:.2}",
-        la.one, la.five, la.fifteen
-    ))
+fn render_vpn(vpns: &belt::ConnectedVpNs, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &VPN::from(vpns))
+            .unwrap(),
+    )
 }
 
-fn render_disk(disk: &belt::Disk) -> Option<String> {
-    Some(format!(
-        "{}: {}/{}",
-        disk.mount_point,
-        disk.total_space_b.format_size(*CUSTOM_FORMAT),
-        disk.available_space_b.format_size(*CUSTOM_FORMAT)
-    ))
-}
-
-fn render_vpn(vpns: &belt::ConnectedVpNs) -> Option<String> {
-    if vpns.aliases.is_empty() {
-        Some(format!("No VPNs!"))
-    } else {
-        Some(format!("VPN: {}", vpns.aliases.join(", ")))
-    }
-}
-
-fn render_cpu(cpu: &belt::Cpu) -> Option<String> {
-    Some(format!("CPU: {:.0}%", cpu.consumption))
+fn render_cpu(cpu: &belt::Cpu, template_str: &str) -> Option<String> {
+    Some(
+        TEMPLATER
+            .rendere_template(template_str, &CPU::from(cpu))
+            .unwrap(),
+    )
 }

@@ -16,18 +16,37 @@ pub struct VpnName {
     pub substring_matcher: String,
 }
 
+pub trait GetTemplate {
+    fn template(&self) -> String;
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Part {
-    Session,
-    Vpn(Vec<VpnName>),
-    ShellCommand(String, bool),
-    Disk(String),
-    Swap,
-    SwapPercents,
-    Memory,
-    MemoryPercents,
-    CPU,
-    LoadAverage,
+    Session(String),
+    Vpn(String, Vec<VpnName>),
+    ShellCommand(String, String, bool),
+    Disk(String, String),
+    Swap(String),
+    Memory(String),
+    CPU(String),
+    LoadAverage(String),
+}
+
+impl GetTemplate for Part {
+    fn template(&self) -> String {
+        let tpl = match self {
+            Part::CPU(tpl) => tpl,
+            Part::Disk(tpl, _) => tpl,
+            Part::LoadAverage(tpl) => tpl,
+            Part::Memory(tpl) => tpl,
+            Part::ShellCommand(tpl, _, _) => tpl,
+            Part::Session(tpl) => tpl,
+            Part::Vpn(tpl, _) => tpl,
+            Part::Swap(tpl) => tpl,
+        };
+
+        tpl.clone()
+    }
 }
 
 impl<'de> de::Deserialize<'de> for Part {
@@ -94,16 +113,12 @@ pub mod parse {
     #[derive(Debug)]
     pub enum ConfigParsingError {
         UnknownPartType,
-        UnknownResource,
     }
 
     impl Display for ConfigParsingError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match &self {
                 ConfigParsingError::UnknownPartType => {
-                    write!(f, "part.type field contains unkownd value")
-                }
-                ConfigParsingError::UnknownResource => {
                     write!(f, "part.type field contains unkownd value")
                 }
             }
@@ -116,9 +131,7 @@ pub mod parse {
         VPN,
         Disk,
         Swap,
-        SwapPercents,
         Memory,
-        MemoryPercents,
         CPU,
         LoadAverage,
     }
@@ -133,9 +146,7 @@ pub mod parse {
                 PartType::CPU => write!(f, "cpu"),
                 PartType::LoadAverage => write!(f, "load_averag"),
                 PartType::Memory => write!(f, "mem"),
-                PartType::MemoryPercents => write!(f, "mem_percent"),
                 PartType::Swap => write!(f, "swap"),
-                PartType::SwapPercents => write!(f, "swap_percent"),
             }
         }
     }
@@ -149,9 +160,7 @@ pub mod parse {
                 "vpn" => Ok(PartType::VPN),
                 "disk" => Ok(PartType::Disk),
                 "mem" => Ok(PartType::Memory),
-                "mem_percent" => Ok(PartType::MemoryPercents),
                 "swap" => Ok(PartType::Swap),
-                "swap_percent" => Ok(PartType::SwapPercents),
                 "cpu" => Ok(PartType::CPU),
                 "load_average" => Ok(PartType::LoadAverage),
 
@@ -176,7 +185,7 @@ pub mod parse {
         }
     }
 
-    fn construct_vpn(m: HashMap<String, Value>) -> Result<Part, serde_yaml::Error> {
+    fn construct_vpn(m: HashMap<String, Value>, tpl: String) -> Result<Part, serde_yaml::Error> {
         if let Some(Value::Sequence(s)) = m.get("names") {
             let vpn_names: Vec<VpnName> = s
                 .chunks(2)
@@ -203,13 +212,13 @@ pub mod parse {
                 })
                 .collect();
 
-            Ok(Part::Vpn(vpn_names))
+            Ok(Part::Vpn(tpl, vpn_names))
         } else {
             Err(Error::missing_field("list"))
         }
     }
 
-    fn construct_shell(m: HashMap<String, Value>) -> Result<Part, serde_yaml::Error> {
+    fn construct_shell(m: HashMap<String, Value>, tpl: String) -> Result<Part, serde_yaml::Error> {
         if let Some(Value::String(str)) = m.get("cmd") {
             let use_pwd = m
                 .get("use_pwd")
@@ -218,15 +227,15 @@ pub mod parse {
                     _ => &false,
                 })
                 .unwrap_or(&false);
-            Ok(Part::ShellCommand(str.to_string(), *use_pwd))
+            Ok(Part::ShellCommand(tpl, str.to_string(), *use_pwd))
         } else {
             Err(Error::missing_field("cmd"))
         }
     }
 
-    fn construct_disk(m: HashMap<String, Value>) -> Result<Part, serde_yaml::Error> {
+    fn construct_disk(m: HashMap<String, Value>, tpl: String) -> Result<Part, serde_yaml::Error> {
         if let Some(Value::String(str)) = m.get("dev") {
-            Ok(Part::Disk(str.to_string()))
+            Ok(Part::Disk(tpl, str.to_string()))
         } else {
             Err(Error::missing_field("dev"))
         }
@@ -253,23 +262,28 @@ pub mod parse {
             }
 
             if let Some(Value::String(part_type_str)) = hash_map.get("type") {
-                if let Ok(part_type) =
-                    PartType::from_str(part_type_str).map_err(serde_yaml::Error::custom)
-                {
-                    match part_type {
-                        PartType::Session => Ok(Part::Session),
-                        PartType::Shell => construct_shell(hash_map).map_err(Error::custom),
-                        PartType::Disk => construct_disk(hash_map).map_err(Error::custom),
-                        PartType::VPN => construct_vpn(hash_map).map_err(Error::custom),
-                        PartType::CPU => Ok(Part::CPU),
-                        PartType::LoadAverage => Ok(Part::LoadAverage),
-                        PartType::Memory => Ok(Part::Memory),
-                        PartType::MemoryPercents => Ok(Part::MemoryPercents),
-                        PartType::Swap => Ok(Part::Swap),
-                        PartType::SwapPercents => Ok(Part::SwapPercents),
+                if let Some(Value::String(template)) = hash_map.get("template") {
+                    if let Ok(part_type) =
+                        PartType::from_str(part_type_str).map_err(serde_yaml::Error::custom)
+                    {
+                        let tpl = template.clone();
+                        match part_type {
+                            PartType::Session => Ok(Part::Session(tpl)),
+                            PartType::Shell => {
+                                construct_shell(hash_map, tpl).map_err(Error::custom)
+                            }
+                            PartType::Disk => construct_disk(hash_map, tpl).map_err(Error::custom),
+                            PartType::VPN => construct_vpn(hash_map, tpl).map_err(Error::custom),
+                            PartType::CPU => Ok(Part::CPU(tpl)),
+                            PartType::LoadAverage => Ok(Part::LoadAverage(tpl)),
+                            PartType::Memory => Ok(Part::Memory(tpl)),
+                            PartType::Swap => Ok(Part::Swap(tpl)),
+                        }
+                    } else {
+                        Err(Error::custom("Cannot decode type field"))
                     }
                 } else {
-                    Err(Error::missing_field("type"))
+                    Err(Error::missing_field("template"))
                 }
             } else {
                 Err(Error::missing_field("type"))
@@ -301,10 +315,14 @@ pub mod parse {
             // Assertions for parts in the first segment
             assert_eq!(app_config.segments[0].fg_palet.len(), 10);
             assert_eq!(app_config.segments[0].parts.len(), 10);
-            assert_eq!(app_config.segments[0].parts[0], Part::Session);
+            assert_eq!(
+                app_config.segments[0].parts[0],
+                Part::Session(": {{v}}".to_string())
+            );
 
-            if let Part::Vpn(vpn_names) = &app_config.segments[0].parts[1] {
+            if let Part::Vpn(tpl, vpn_names) = &app_config.segments[0].parts[1] {
                 // Assertions for VPN names
+                assert_eq!(tpl, &"{{#if v}}󰖂: {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs connected.{{/if}}".to_string());
                 assert_eq!(vpn_names.len(), 2);
                 assert_eq!(
                     vpn_names[0],
@@ -325,20 +343,39 @@ pub mod parse {
             }
 
             // Assertions for remaining parts in the first segment
-            assert_eq!(app_config.segments[0].parts[2], Part::Memory);
-            assert_eq!(app_config.segments[0].parts[3], Part::MemoryPercents);
-            assert_eq!(app_config.segments[0].parts[4], Part::CPU);
-            assert_eq!(app_config.segments[0].parts[5], Part::LoadAverage);
-            assert_eq!(app_config.segments[0].parts[6], Part::Swap);
-            assert_eq!(app_config.segments[0].parts[7], Part::SwapPercents);
+            assert_eq!(
+                app_config.segments[0].parts[2],
+                Part::Memory(": {{v.total}}/{{v.available}}/{{v.used}}".to_string())
+            );
+            assert_eq!(
+                app_config.segments[0].parts[3],
+                Part::Memory("Mem: {{v.used_percents}}%".to_string())
+            );
+            assert_eq!(
+                app_config.segments[0].parts[4],
+                Part::CPU(": {{v}}%".to_string())
+            );
+            assert_eq!(
+                app_config.segments[0].parts[5],
+                Part::LoadAverage("LA: {{v.one}}, {{v.five}}, {{v.fifteen}}".to_string())
+            );
+            assert_eq!(
+                app_config.segments[0].parts[6],
+                Part::Swap("Swap: {{v.total}}/{{v.used}}".to_string())
+            );
+            assert_eq!(
+                app_config.segments[0].parts[7],
+                Part::Swap("󰾴: {{v.used_percents}}%".to_string())
+            );
 
             // Assertions for the second segment
             assert_eq!(app_config.segments[1].name, "right");
 
             // Assertions for parts in the second segment
             assert_eq!(app_config.segments[1].parts.len(), 1);
-            if let Part::ShellCommand(shell_cmd, use_pwd) = &app_config.segments[1].parts[0] {
+            if let Part::ShellCommand(tpl, shell_cmd, use_pwd) = &app_config.segments[1].parts[0] {
                 assert_eq!(shell_cmd, "gitmux -cfg ~/.config/tmux/gitmux.yaml");
+                assert_eq!(tpl, &"{{v.stdout}}".to_string());
                 assert_eq!(*use_pwd, true);
             } else {
                 panic!("Expected ShellCommand part in the second segment");

@@ -1,0 +1,13 @@
+[Unit]
+Description=Rusty-belt server part
+Documentation=https://github.com/fido-node/rusty-belt
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/rusty_belt_server
+KillMode=process
+Restart=on-failure
+User
+
+[Install]
+WantedBy=default.target

@@ -46,7 +46,7 @@ impl Rehydrator {
                 {
                     system.lock().unwrap().refresh_all();
                 }
-                task(state.clone(), cache.clone(), system.clone()).await;
+                let r = task(state.clone(), cache.clone(), system.clone()).await;
             }
         });
         self.handle = Arc::new(Some(forever));

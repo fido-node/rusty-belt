@@ -10,7 +10,7 @@ use crate::{
 
 use lazy_static::lazy_static;
 
-use self::view::representation::{Disk, Mem, Session, Shell, Swap, CPU, LA, VPN, *};
+use self::view::representation::{Disk, Mem, Session, Shell, Swap, CPU, LA, VPN};
 
 lazy_static! {
     static ref TEMPLATER: Templater = Templater::default();

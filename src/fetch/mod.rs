@@ -1,10 +1,8 @@
-
-
-use sysinfo::{CpuExt, DiskExt, System, SystemExt};
-
 use crate::state::rehydrator::{CacheKey, CacheSnapshot, CacheValue};
+use sysinfo::{CpuExt, DiskExt, System, SystemExt};
+use systemstat::Platform;
 
-pub type UpdateFn = fn(&mut CacheSnapshot, &System) -> Result<(), ()>;
+pub type UpdateFn = fn(&mut CacheSnapshot, &System, &systemstat::System) -> Result<(), ()>;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct NetworkInfo {
@@ -48,7 +46,7 @@ pub struct ResourceInfo {
 #[derive(Debug, PartialEq, Clone)]
 pub struct DiskInfo {
     pub dev: String,
-    pub mount_point: Option<String>,
+    pub mount_point: String,
     pub total_space: u64,
     pub free_space: u64,
 }
@@ -57,28 +55,37 @@ impl DiskInfo {
     pub fn default() -> DiskInfo {
         DiskInfo {
             dev: "".to_string(),
-            mount_point: None,
+            mount_point: "".to_string(),
             total_space: 0,
             free_space: 0,
         }
     }
 }
 
-pub fn fetch_disk_info(cache_snapshot: &mut CacheSnapshot, sys: &System) -> Result<(), ()> {
+pub fn fetch_disk_info(
+    cache_snapshot: &mut CacheSnapshot,
+    _sys: &System,
+    platform: &systemstat::System,
+) -> Result<(), ()> {
+    let mounts = platform.mounts().unwrap_or(Vec::default());
     let mut disks: Vec<DiskInfo> = Vec::new();
-    for disk in sys.disks() {
+    for disk in mounts {
         disks.push(DiskInfo {
-            dev: disk.name().to_string_lossy().to_string(),
-            mount_point: None,
-            free_space: disk.available_space(),
-            total_space: disk.total_space(),
+            dev: disk.fs_mounted_from.clone(),
+            mount_point: disk.fs_mounted_on.clone(),
+            free_space: disk.avail.0,
+            total_space: disk.total.0,
         });
     }
     cache_snapshot.insert(CacheKey::DiskStats, CacheValue::DiskStats(disks));
     Ok(())
 }
 
-pub fn fetch_resources_info(cache_snapshot: &mut CacheSnapshot, sys: &System) -> Result<(), ()> {
+pub fn fetch_resources_info(
+    cache_snapshot: &mut CacheSnapshot,
+    sys: &System,
+    _platform: &systemstat::System,
+) -> Result<(), ()> {
     // Swap,
     // SwapPercents,
     // Memory,
@@ -120,7 +127,11 @@ pub fn fetch_resources_info(cache_snapshot: &mut CacheSnapshot, sys: &System) ->
     Ok(())
 }
 
-pub fn fetch_networks_info(cache_snapshot: &mut CacheSnapshot, _sys: &System) -> Result<(), ()> {
+pub fn fetch_networks_info(
+    cache_snapshot: &mut CacheSnapshot,
+    _sys: &System,
+    _platform: &systemstat::System,
+) -> Result<(), ()> {
     let mut networks: Vec<NetworkInfo> = Vec::new();
 
     let interfaces = default_net::get_interfaces();

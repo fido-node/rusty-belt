@@ -128,6 +128,7 @@ pub mod representation {
         pub device_path: String,
         pub available_space: String,
         pub total_space: String,
+        pub used_percents: String,
     }
 
     #[derive(Serialize, Clone, Debug)]
@@ -142,6 +143,12 @@ pub mod representation {
                 device_path: value.device_path.clone(),
                 available_space: value.available_space_b.format_size(*CUSTOM_FORMAT),
                 total_space: value.total_space_b.format_size(*CUSTOM_FORMAT),
+                used_percents: format!(
+                    "{:.0}",
+                    (((value.total_space_b - value.available_space_b) as f64
+                        / value.total_space_b as f64)
+                        * 100.0)
+                ),
             };
             Disk { v: diskv }
         }

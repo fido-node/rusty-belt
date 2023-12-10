@@ -1,3 +1,5 @@
+use systemstat::{Platform, System};
+
 use crate::{
     fetch::DiskInfo,
     protocol::rusty::belt::{self, segment_value},
@@ -25,8 +27,8 @@ impl Model for Disk {
     fn get_state(&self, _context: &Context) -> segment_value::Segment {
         let di = &self.disk_info;
         let mut result = belt::Disk::default();
-        result.mount_point = di.mount_point.clone().unwrap_or("".to_string());
-        result.device_path = self.dev.clone();
+        result.mount_point = di.mount_point.clone();
+        result.device_path = di.dev.clone();
         result.available_space_b = di.free_space;
         result.total_space_b = di.total_space;
         segment_value::Segment::Disk(result)
@@ -37,6 +39,8 @@ impl Model for Disk {
     }
 
     fn rehydrate(&mut self, cache_snapshot: &CacheSnapshot) -> Result<(), ()> {
+        let _sys = System::new();
+
         if let Some(disk_stats) = cache_snapshot.get(&CacheKey::DiskStats) {
             match disk_stats {
                 CacheValue::DiskStats(stats) => {
@@ -66,11 +70,10 @@ mod disk_tests {
 
         // Create a context (You may need to provide a suitable context)
         let context = Context::default();
-        println!("{:?}", disk_model);
 
         // Test get_state method
         let expected_segment = segment_value::Segment::Disk(belt::Disk {
-            device_path: String::from("/dev/sda"),
+            device_path: String::from(""),
             mount_point: String::from(""),
             available_space_b: 0,
             total_space_b: 0,
@@ -103,7 +106,7 @@ mod disk_tests {
         // Verify that the disk_info has been updated after rehydration
         let expected_disk_info = DiskInfo {
             dev: String::from("/dev/sda"),
-            mount_point: Some(String::from("/")),
+            mount_point: String::from("/"),
             total_space: 102400,
             free_space: 51200,
         };

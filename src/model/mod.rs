@@ -135,7 +135,7 @@ mod tests {
 
         let disk_info = DiskInfo {
             dev: String::from("/dev/sda"),
-            mount_point: Some(String::from("/")),
+            mount_point: String::from("/"),
             total_space: 102400,
             free_space: 51200,
         };

@@ -1,11 +1,13 @@
 pub mod representation {
 
+    use std::collections::VecDeque;
+
     use lazy_static::lazy_static;
 
     use humansize::{FormatSize, FormatSizeOptions, WINDOWS};
     use serde::Serialize;
 
-    use crate::protocol::rusty::belt;
+    use crate::{protocol::rusty::belt, render::chart::percent_vec_to_chart};
 
     lazy_static! {
         static ref CUSTOM_FORMAT: FormatSizeOptions =
@@ -44,6 +46,7 @@ pub mod representation {
         pub available: String,
         pub used: String,
         pub used_percents: String,
+        used_percents_graph: String,
     }
 
     #[derive(Serialize, Clone, Debug)]
@@ -53,11 +56,20 @@ pub mod representation {
 
     impl From<&belt::Mem> for Mem {
         fn from(value: &belt::Mem) -> Self {
+            let series = VecDeque::from(
+                value
+                    .used_percents_series
+                    .iter()
+                    .map(|s| *s)
+                    .collect::<Vec<f64>>(),
+            );
+
             let memv = MemV {
                 available: value.available.format_size(*CUSTOM_FORMAT),
                 total: value.total.format_size(*CUSTOM_FORMAT),
                 used: value.used.format_size(*CUSTOM_FORMAT),
-                used_percents: format!("{:.0}", ((value.used as f64 / value.total as f64) * 100.0)),
+                used_percents: format!("{:.0}", series.back().map(|s| *s).unwrap_or(0.0)),
+                used_percents_graph: percent_vec_to_chart(&value.used_percents_series),
             };
             Mem { v: memv }
         }
@@ -87,15 +99,31 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
+    struct CPUV {
+        consumption: String,
+        consumption_graph: String,
+    }
+
+    #[derive(Serialize, Clone, Debug)]
     pub struct CPU {
-        pub v: String,
+        pub v: CPUV,
     }
 
     impl From<&belt::Cpu> for CPU {
         fn from(value: &belt::Cpu) -> Self {
-            CPU {
-                v: format!("{:.0}", value.consumption),
-            }
+            let series: VecDeque<f64> = VecDeque::from(
+                value
+                    .consumption_series
+                    .iter()
+                    .map(|s| *s)
+                    .collect::<Vec<f64>>(),
+            );
+
+            let cpuv = CPUV {
+                consumption: format!("{:.0}", series.back().map(|s| *s).unwrap_or(0.0)),
+                consumption_graph: percent_vec_to_chart(&value.consumption_series),
+            };
+            CPU { v: cpuv }
         }
     }
 
@@ -104,6 +132,7 @@ pub mod representation {
         pub total: String,
         pub used: String,
         pub used_percents: String,
+        pub used_percents_graph: String,
     }
 
     #[derive(Serialize, Clone, Debug)]
@@ -113,10 +142,18 @@ pub mod representation {
 
     impl From<&belt::Swap> for Swap {
         fn from(value: &belt::Swap) -> Self {
+            let series = VecDeque::from(
+                value
+                    .used_percents_series
+                    .iter()
+                    .map(|s| *s)
+                    .collect::<Vec<f64>>(),
+            );
             let swapv = SwapV {
                 total: value.total.format_size(*CUSTOM_FORMAT),
                 used: value.used.format_size(*CUSTOM_FORMAT),
-                used_percents: format!("{:.0}", ((value.used as f64 / value.total as f64) * 100.0)),
+                used_percents: format!("{:.0}", series.back().map(|s| *s).unwrap_or(0.0)),
+                used_percents_graph: percent_vec_to_chart(&value.used_percents_series),
             };
             Swap { v: swapv }
         }

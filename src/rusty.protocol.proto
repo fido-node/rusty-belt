@@ -39,7 +39,7 @@ message SegmentValue {
 }
 
 message CPU {
-  float consumption = 1;
+  repeated double consumption_series = 1;
 }
 
 message Disk {
@@ -59,7 +59,7 @@ message Mem {
   uint64 total = 1;
   uint64 available = 2;
   uint64 used = 3;
-  uint64 used_percents = 4;
+  repeated double used_percents_series = 5;
 }
 
 message TmuxSessionName {
@@ -69,7 +69,7 @@ message TmuxSessionName {
 message Swap {
   uint64 total = 1;
   uint64 used = 2;
-  uint64 used_percents = 3;
+  repeated double used_percents_series = 4;
 }
 
 message ShellExecutionResult {

@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::{
     protocol::rusty::belt::{self, segment_value},
     state::rehydrator::{CacheKey, CacheValue},
@@ -13,6 +15,7 @@ pub struct Mem {
     total: u64,
     used: u64,
     available: u64,
+    used_percents_series: VecDeque<f64>,
 }
 
 impl Mem {
@@ -21,6 +24,7 @@ impl Mem {
             total: 1,
             used: 1,
             available: 1,
+            used_percents_series: VecDeque::with_capacity(9),
         }
     }
 }
@@ -29,11 +33,13 @@ impl Model for Mem {
     fn get_cache_key(&self) -> Option<CacheKey> {
         Some(CacheKey::Resources)
     }
+
     fn get_state(&self, _context: &Context) -> segment_value::Segment {
         let mut result = belt::Mem::default();
         result.available = self.available;
         result.used = self.used;
         result.total = self.total;
+        result.used_percents_series = self.used_percents_series.iter().map(|v| *v).collect();
         segment_value::Segment::Memory(result)
     }
 
@@ -47,6 +53,11 @@ impl Model for Mem {
                         self.available = m.available;
                         self.total = m.total;
                         self.used = m.used;
+                        let used_percents = (m.used as f64 / m.total as f64) * 100.0;
+                        self.used_percents_series.push_back(used_percents);
+                        if self.used_percents_series.len() >= 8 {
+                            self.used_percents_series.pop_front();
+                        }
                     }
                 }
                 _ => (),

@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::{
     protocol::rusty::belt::{segment_value, Cpu},
     state::rehydrator::{CacheKey, CacheValue},
@@ -7,12 +9,14 @@ use super::{CacheSnapshot, Context, Model};
 
 #[derive(Debug, PartialEq)]
 pub struct CPU {
-    consumption: f32,
+    consumption_series: VecDeque<f64>,
 }
 
 impl CPU {
     pub fn new() -> Self {
-        CPU { consumption: 0.0 }
+        CPU {
+            consumption_series: VecDeque::with_capacity(9),
+        }
     }
 }
 
@@ -23,7 +27,7 @@ impl Model for CPU {
 
     fn get_state(&self, _context: &Context) -> segment_value::Segment {
         let mut cpu = Cpu::default();
-        cpu.consumption = self.consumption;
+        cpu.consumption_series = self.consumption_series.iter().map(|v| *v).collect();
         segment_value::Segment::Cpu(cpu)
     }
 
@@ -32,7 +36,10 @@ impl Model for CPU {
             match resource_stats {
                 CacheValue::Resources(stats) => {
                     for stat in stats.into_iter() {
-                        self.consumption = stat.cpu.usage;
+                        self.consumption_series.push_back(stat.cpu.usage as f64);
+                        if self.consumption_series.len() >= 8 {
+                            self.consumption_series.pop_front();
+                        }
                     }
                 }
                 _ => (),

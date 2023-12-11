@@ -1,3 +1,4 @@
+pub mod chart;
 pub mod templater;
 pub mod view;
 

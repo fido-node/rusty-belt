@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::{
     protocol::rusty::belt::{self, segment_value},
     state::rehydrator::{CacheKey, CacheValue},
@@ -9,11 +11,16 @@ use super::{CacheSnapshot, Context, Model};
 pub struct Swap {
     used: u64,
     total: u64,
+    used_percents_series: VecDeque<f64>,
 }
 
 impl Swap {
     pub fn new() -> Self {
-        Self { used: 0, total: 0 }
+        Self {
+            used: 0,
+            total: 0,
+            used_percents_series: VecDeque::with_capacity(9),
+        }
     }
 }
 
@@ -26,6 +33,8 @@ impl Model for Swap {
         let mut result = belt::Swap::default();
         result.used = self.used;
         result.total = self.total;
+        result.used_percents_series = self.used_percents_series.iter().map(|v| *v).collect();
+
         segment_value::Segment::Swap(result)
     }
 
@@ -37,6 +46,11 @@ impl Model for Swap {
                         let s = &stat.swap;
                         self.used = s.used;
                         self.total = s.total;
+                        let used_percents = (s.used as f64 / s.total as f64) * 100.0;
+                        self.used_percents_series.push_back(used_percents);
+                        if self.used_percents_series.len() >= 8 {
+                            self.used_percents_series.pop_front();
+                        }
                     }
                 }
                 _ => (),

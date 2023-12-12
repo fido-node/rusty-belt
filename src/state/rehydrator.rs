@@ -5,19 +5,16 @@ use std::{
     time::Duration,
 };
 
+use crate::{
+    fetch::{DiskInfo, NetworkInfo, ResourceInfo},
+    state::State,
+};
 use sysinfo::{System, SystemExt};
 use systemstat::Platform;
 use tokio::{
     task::{self, JoinHandle},
     time,
 };
-
-use crate::{
-    fetch::{DiskInfo, NetworkInfo, ResourceInfo},
-    state::State,
-};
-
-// let STATE: Mutex<CacheSnapshot> = Mutex::new(HashMap::new());
 
 pub struct Rehydrator {
     state: Arc<State>,

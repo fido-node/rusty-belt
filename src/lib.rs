@@ -7,5 +7,4 @@ pub mod model;
 pub mod protocol;
 pub mod render;
 pub mod state;
-pub mod theme;
 pub mod util;

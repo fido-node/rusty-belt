@@ -13,7 +13,6 @@ pub fn fetch_tmux_name() -> Result<String, Utf8Error> {
 
     from_utf8_mut(tmux_session.as_mut_slice()).map(|s| s.trim().to_string())
 }
-// tmux display-message -p '#{pane_current_path}'
 
 pub fn fetch_tmux_current_path() -> Result<String, Utf8Error> {
     let mut tmux_session = Command::new("sh")

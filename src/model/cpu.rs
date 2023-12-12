@@ -66,7 +66,9 @@ mod tests {
     fn test_cpu_get_state() {
         let cpu_model = CPU::new();
         let context = Context::default(); // You may need to provide a suitable context
-        let expected_segment = segment_value::Segment::Cpu(Cpu { consumption: 0.0 });
+        let expected_segment = segment_value::Segment::Cpu(Cpu {
+            consumption_series: vec![],
+        });
         assert_eq!(cpu_model.get_state(&context), expected_segment);
     }
 
@@ -83,6 +85,6 @@ mod tests {
         assert_eq!(result, Ok(()));
 
         // Verify that the consumption value has been updated after rehydration
-        assert_eq!(cpu_model.consumption, 0.75); // Assuming that the sample value in create_cache_snapshot_with_resources is 0.75
+        assert_eq!(cpu_model.consumption_series, vec![0.75]); // Assuming that the sample value in create_cache_snapshot_with_resources is 0.75
     }
 }

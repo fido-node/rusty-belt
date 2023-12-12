@@ -3,7 +3,7 @@ server:
   update_interval: 2
 segments:
   - name: left
-    fg_palet:
+    bg_palet:
       - f5e0dc
       - f5c2e7
       - cba6f7
@@ -14,6 +14,11 @@ segments:
       - 89dceb
       - 89b4fa
       - b4befe
+    fg_palet:
+      - 11111b
+      - 181825
+      - 1e1e2e
+    separator: 
     parts:
       - type: session_name
         # Where v is string value with session name
@@ -52,6 +57,23 @@ segments:
         cmd: free -m -h | awk '/Mem/{printf $3"/"$2}'
         template: "{{v.stdout}}"
   - name: right
+    bg_palet:
+      - f5e0dc
+      - f5c2e7
+      - cba6f7
+      - eba0ac
+      - f9e2af
+      - a6e3a1
+      - 94e2d5
+      - 89dceb
+      - 89b4fa
+      - b4befe
+    fg_palet:
+      - 11111b
+      - 181825
+      - 1e1e2e
+    separator: 
+    direction: rtl
     parts:
       - type: shell
         use_pwd: true

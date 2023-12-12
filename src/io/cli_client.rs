@@ -3,7 +3,7 @@ use crate::protocol::{
     rusty::belt,
 };
 use futures::{SinkExt, StreamExt};
-use log::{error};
+use log::error;
 use tokio::net::{
     unix::{ReadHalf, WriteHalf},
     UnixStream,
@@ -20,9 +20,7 @@ impl CliClient {
     }
 
     pub async fn make_request(self, request: belt::Request) -> Result<belt::Response, ()> {
-        if let Ok(mut connection) =
-            UnixStream::connect(self.addr).await
-        {
+        if let Ok(mut connection) = UnixStream::connect(self.addr).await {
             let (read_stream, write_stream) = connection.split();
 
             let reader = FramedRead::new(read_stream, ResponseCodec {});
@@ -33,7 +31,6 @@ impl CliClient {
         } else {
             Err(())
         }
-
     }
 }
 

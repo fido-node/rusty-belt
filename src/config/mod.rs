@@ -61,9 +61,19 @@ impl<'de> de::Deserialize<'de> for Part {
 #[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct Segment {
     pub name: String,
+    #[serde(default = "String::new")]
+    pub separator: String,
     #[serde(default = "Vec::new")]
     pub fg_palet: Vec<String>,
+    #[serde(default = "Vec::new")]
+    pub bg_palet: Vec<String>,
+    #[serde(default = "default_direction")]
+    pub direction: String,
     pub parts: Vec<Part>,
+}
+
+fn default_direction() -> String {
+    "ltr".to_string()
 }
 
 #[derive(Deserialize, Debug)]
@@ -313,7 +323,7 @@ pub mod parse {
             assert_eq!(app_config.segments[0].name, "left");
 
             // Assertions for parts in the first segment
-            assert_eq!(app_config.segments[0].fg_palet.len(), 10);
+            assert_eq!(app_config.segments[0].fg_palet.len(), 3);
             assert_eq!(app_config.segments[0].parts.len(), 10);
             assert_eq!(
                 app_config.segments[0].parts[0],

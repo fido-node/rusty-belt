@@ -1,4 +1,5 @@
 pub mod chart;
+pub mod separator;
 pub mod templater;
 pub mod view;
 
@@ -11,7 +12,10 @@ use crate::{
 
 use lazy_static::lazy_static;
 
-use self::view::representation::{Disk, Mem, Session, Shell, Swap, CPU, LA, VPN};
+use self::{
+    separator::{palet_iterator, Separator},
+    view::representation::{Disk, Mem, Session, Shell, Swap, CPU, LA, VPN},
+};
 
 lazy_static! {
     static ref TEMPLATER: Templater = Templater::default();
@@ -20,8 +24,14 @@ lazy_static! {
 pub fn render_response(response: belt::Response, config: &config::Segment) -> String {
     let default_color = "default".to_string();
     let mut result = Vec::new();
-    let mut fg_color_palet = config.fg_palet.iter().cycle();
+    let mut styled_result = String::from("");
+    let reverse = config.direction == "rtl".to_owned();
+    let mut separator_colorer = Separator::new(reverse, &config.bg_palet);
+    let mut fg_color_palet = palet_iterator(&config.fg_palet, reverse);
+    let mut bg_color_palet = palet_iterator(&config.bg_palet, reverse);
+
     let segments = &config.parts;
+    let separator = &config.separator;
 
     if let Some(r) = response.client_response {
         match r {
@@ -52,18 +62,54 @@ pub fn render_response(response: belt::Response, config: &config::Segment) -> St
                     } else {
                         None
                     };
+
                     if let Some(rendered_part) = some_result {
-                        let fg_color = fg_color_palet
-                            .next()
-                            .map(|s| format!("#{}", s))
-                            .unwrap_or(default_color.clone());
-                        result.push(format!("#[fg={}]{} #[fg=default]", fg_color, rendered_part));
+                        result.push(rendered_part);
                     }
                 }
             }
         }
     }
-    result.join(" ")
+
+    for (i, v) in result.iter().enumerate() {
+        let fg_color = fg_color_palet
+            .next()
+            .map(|s| format!("#{}", s))
+            .unwrap_or(default_color.clone());
+        let bg_color = bg_color_palet
+            .next()
+            .map(|s| format!("#{}", s))
+            .unwrap_or(default_color.clone());
+
+        let mut rendered_str = v.clone();
+        if i <= result.len() {
+            rendered_str.push_str("")
+        }
+
+        if i > 0 || (reverse && i == 0) {
+            let (separator_fg, separator_bg) = separator_colorer.get_color_pair(reverse && i == 0);
+            styled_result.push_str(&format!(
+                "#[fg={},bg={}]{}#[fg=default,bg=default]",
+                separator_fg, separator_bg, separator
+            ));
+        }
+
+        styled_result.push_str(&format!(
+            "#[fg={},bg={}] {} #[fg=default,bg=default]",
+            fg_color, bg_color, rendered_str
+        ));
+
+        if ((i == result.len() - 1) && !reverse) || (reverse && i > 0 && i != result.len() - 1) {
+            let (separator_fg, separator_bg) =
+                separator_colorer.get_color_pair((i == result.len() - 1) && !reverse);
+
+            styled_result.push_str(&format!(
+                "#[fg={},bg={}]{}#[fg=default,bg=default]",
+                separator_fg, separator_bg, separator
+            ));
+        }
+    }
+    styled_result
 }
 
 fn render_session_name(session_name: &belt::TmuxSessionName, template_str: &str) -> Option<String> {

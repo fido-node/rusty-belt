@@ -31,10 +31,10 @@ segments:
         template: ": {{v.total}}/{{v.available}}/{{v.used}}"
       - type: mem
         # Where v is a structure with humanized string fields 'used', 'available', 'total' and 'used_percents'
-        template: "Mem: {{v.used_percents}}%"
+        template: "Mem: {{v.used_percents}}% {{v.used_percents_graph}}"
       - type: cpu
         # Where v is a string value without percent symbol
-        template: ": {{v}}%"
+        template: ": {{v.consumption}}%"
       - type: load_average
         # Where v is a structure with humanized string fields 'one', 'five' and 'fifteen'
         template: "LA: {{v.one}}, {{v.five}}, {{v.fifteen}}"

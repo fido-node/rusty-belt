@@ -349,11 +349,11 @@ pub mod parse {
             );
             assert_eq!(
                 app_config.segments[0].parts[3],
-                Part::Memory("Mem: {{v.used_percents}}%".to_string())
+                Part::Memory("Mem: {{v.used_percents}}% {{v.used_percents_graph}}".to_string())
             );
             assert_eq!(
                 app_config.segments[0].parts[4],
-                Part::CPU(": {{v}}%".to_string())
+                Part::CPU(": {{v.consumption}}%".to_string())
             );
             assert_eq!(
                 app_config.segments[0].parts[5],

@@ -41,7 +41,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct MemV {
+    pub struct MemV {
         pub total: String,
         pub available: String,
         pub used: String,
@@ -76,7 +76,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct LAV {
+    pub struct LAV {
         pub one: String,
         pub five: String,
         pub fifteen: String,
@@ -99,7 +99,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct CPUV {
+    pub struct CPUV {
         consumption: String,
         consumption_graph: String,
     }
@@ -128,7 +128,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct SwapV {
+    pub struct SwapV {
         pub total: String,
         pub used: String,
         pub used_percents: String,
@@ -160,7 +160,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct DiskV {
+    pub struct DiskV {
         pub mount_point: String,
         pub device_path: String,
         pub available_space: String,
@@ -192,7 +192,7 @@ pub mod representation {
     }
 
     #[derive(Serialize, Clone, Debug)]
-    struct ShellV {
+    pub struct ShellV {
         pub stdout: String,
     }
 
@@ -207,6 +207,85 @@ pub mod representation {
                 stdout: value.stdout.clone(),
             };
             Shell { v: shellv }
+        }
+    }
+
+    #[cfg(test)]
+    pub mod sample_data {
+        use crate::render::view::representation::*;
+
+        pub fn sample_session() -> Session {
+            Session {
+                v: String::from("sample_session"),
+            }
+        }
+
+        pub fn sample_vpn() -> VPN {
+            VPN {
+                v: vec![String::from("vpn1"), String::from("vpn2")],
+            }
+        }
+
+        pub fn sample_mem() -> Mem {
+            Mem {
+                v: MemV {
+                    total: String::from("16 GB"),
+                    available: String::from("8 GB"),
+                    used: String::from("8 GB"),
+                    used_percents: String::from("50"),
+                    used_percents_graph: String::from("███████▓░░░░░░"),
+                },
+            }
+        }
+
+        pub fn sample_la() -> LA {
+            LA {
+                v: LAV {
+                    one: String::from("1.25"),
+                    five: String::from("2.50"),
+                    fifteen: String::from("3.75"),
+                },
+            }
+        }
+
+        pub fn sample_cpu() -> CPU {
+            CPU {
+                v: CPUV {
+                    consumption: String::from("75"),
+                    consumption_graph: String::from("███████████░░"),
+                },
+            }
+        }
+
+        pub fn sample_swap() -> Swap {
+            Swap {
+                v: SwapV {
+                    total: String::from("4 GB"),
+                    used: String::from("1 GB"),
+                    used_percents: String::from("25"),
+                    used_percents_graph: String::from("████▓░░░░░░░░"),
+                },
+            }
+        }
+
+        pub fn sample_disk() -> Disk {
+            Disk {
+                v: DiskV {
+                    mount_point: String::from("/mnt/data"),
+                    device_path: String::from("/dev/sda1"),
+                    available_space: String::from("100 GB"),
+                    total_space: String::from("200 GB"),
+                    used_percents: String::from("50"),
+                },
+            }
+        }
+
+        pub fn sample_shell() -> Shell {
+            Shell {
+                v: ShellV {
+                    stdout: String::from("Sample shell output."),
+                },
+            }
         }
     }
 }

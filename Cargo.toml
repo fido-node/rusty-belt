@@ -9,7 +9,7 @@ authors = ["Aleksandr Mikhailov <iam@fidonode.me>"]
 description = "Application for collecting system information. Now you can show it in tmux status"
 keywords = ["cli", "tmux", "status"]
 categories = ["command-line-utilities"]
-include = ["/src", "README.md", "/examples", "LICENSE"]
+include = ["/src", "README.md", "/examples", "LICENSE", "build.rs"]
 
 [dependencies]
 clap = { version = "4.4.8", features = ["derive", "env", "unicode"] }

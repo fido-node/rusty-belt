@@ -11,8 +11,9 @@ Server caches all state and client fetches only status snapshot. So client can a
 ~~Right now just cargo~~
 
 # How to configure
-Copy ’example/config.yaml’ to ‘~/.config/rusty-belt/‘
-Copy ’example/log4rs.yaml’ to ‘~/.config/rusty-belt/‘
+Copy `example/config.yaml` to `~/.config/rusty-belt/`
+
+Copy `example/log4rs.yaml` to `~/.config/rusty-belt/`
 
 
 # Architecture diagram

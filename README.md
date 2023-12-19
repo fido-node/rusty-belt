@@ -42,7 +42,19 @@ cd ~/.config/rusty-belt
 
 touch config.yaml # see example in examples/config.yaml
 touch log4rs.yaml # see example in examples/config.yaml
+
+# check that server works
+systemctl --user status rusty-belt.service
+
+
 ```
+
+Use statuses in your tmux config
+```
+set -g status-right "#(tmux_client --segment-name=right)"
+set -g status-left "#(tmux_client --segment-name=left)"
+```
+
 
 </details>
 

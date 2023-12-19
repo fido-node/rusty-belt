@@ -8,12 +8,25 @@ I hate to write shell scripts
 Server caches all state and client fetches only status snapshot. So client can ask a server 1000 times per sec and it will not affect render time.
 
 # How to install
-~~Right now just cargo~~
+<details>
+  <summary>Install on GNU/Linux with cargo</summary>
 
-# How to configure
-Copy `example/config.yaml` to `~/.config/rusty-belt/`
+```bash
+cargo install rusty-belt
+cd ~/.config/systemd/user/
 
-Copy `example/log4rs.yaml` to `~/.config/rusty-belt/`
+touch rusty-belt.service # see example in resources/rusty-belt.service
+systemctl daemon-reload --user
+systemctl --user restart rusty-belt.service
+
+mkdir ~/.config/rusty-belt
+cd ~/.config/rusty-belt
+
+touch config.yaml # see example in examples/config.yaml
+touch log4rs.yaml # see example in examples/config.yaml
+```
+
+</details>
 
 
 # Architecture diagram

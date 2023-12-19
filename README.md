@@ -47,6 +47,9 @@ touch log4rs.yaml # see example in examples/config.yaml
 </details>
 
 # My daily driver config
+
+Colors based on awesome [catppuccin](https://github.com/catppuccin) theme
+
 <details>
    <summary>config.yaml</summary>
  

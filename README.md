@@ -1,3 +1,6 @@
+# Rusty Belt
+![rusty-belt](https://raw.githubusercontent.com/fido-node/rusty-belt/main/resources/only_bar.png)
+
 # What is it
 Client-server implementation of tmux statuses
 
@@ -27,6 +30,11 @@ touch log4rs.yaml # see example in examples/config.yaml
 ```
 
 </details>
+
+# Screenshots
+![rusty-belt](https://raw.githubusercontent.com/fido-node/rusty-belt/main/resources/full_screenshot.png)
+
+![rusty-belt gif](https://raw.githubusercontent.com/fido-node/rusty-belt/main/resources/cast.gif)
 
 
 # Architecture diagram

@@ -4,6 +4,20 @@
 # What is it
 Client-server implementation of tmux statuses
 
+# Features
+ - Support of powerline like theme with separator
+ - Support of BG and FG color pallets with round robin. 
+ - CPU, Mem, Swap, Disk infortmation
+ - Run shell commands with current PWD and without
+ - Find and show connectes networks. (may be usefull for enumerating connected VPNs)
+ - Show tmux session
+
+# WIP features
+ - mac os brew build and instructions
+ - show current media status (artist/track/play/pause)
+ - weather info
+ - battery status
+
 # Why
 I hate to write shell scripts
 

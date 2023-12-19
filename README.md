@@ -13,10 +13,11 @@ Client-server implementation of tmux statuses
  - Show tmux session
 
 # WIP features
- - mac os brew build and instructions
- - show current media status (artist/track/play/pause)
- - weather info
- - battery status
+ - Docs
+ - Mac os brew build and instructions
+ - Show current media status (artist/track/play/pause)
+ - Weather info
+ - Battery status
 
 # Why
 I hate to write shell scripts
@@ -41,6 +42,78 @@ cd ~/.config/rusty-belt
 
 touch config.yaml # see example in examples/config.yaml
 touch log4rs.yaml # see example in examples/config.yaml
+```
+
+</details>
+
+# My daily driver config
+<details>
+   <summary>config.yaml</summary>
+ 
+```yaml
+ ---
+server:
+  update_interval: 1
+segments:
+  - name: left
+    bg_palet:
+      - f5e0dc
+      - f5c2e7
+      - cba6f7
+      - eba0ac
+      - f9e2af
+      - a6e3a1
+      - 94e2d5
+      - 89dceb
+      - 89b4fa
+      - b4befe
+    fg_palet:
+      - 11111b
+      - 181825
+      - 1e1e2e
+    separator: 
+    direction: ltr
+    parts:
+      - type: session_name
+        template: " {{v}}"
+      - type: vpn
+        template: "{{#if v}}󰖂 {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs{{/if}}"
+        names:
+          - substring_matcher: "10.154.1."
+            name: "prod"
+          - substring_matcher: "10.154.154."
+            name: "dev"
+      - type: mem
+        template: " {{v.used_percents}}% {{v.used_percents_graph}}"
+      - type: cpu
+        template: " {{v.consumption}}% {{v.consumption_graph}}"
+  - name: right
+    bg_palet:
+      - f5e0dc
+      - f5c2e7
+      - cba6f7
+      - eba0ac
+      - f9e2af
+      - a6e3a1
+      - 94e2d5
+      - 89dceb
+      - 89b4fa
+      - b4befe
+    fg_palet:
+      - 11111b
+      - 181825
+      - 1e1e2e
+    separator: 
+    direction: rtl
+    parts:
+      - type: disk
+        dev: /dev/mapper/luks-7a504a5c-d5f0-4175-95b6-3a97c15a21ce
+        template: "  {{v.mount_point}} {{v.available_space}}"
+      - type: shell
+        use_pwd: true
+        cmd: gitmux -cfg ~/.config/tmux/gitmux.yaml
+        template: "{{v.stdout}}"
+
 ```
 
 </details>

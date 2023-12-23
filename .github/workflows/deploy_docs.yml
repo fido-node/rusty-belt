@@ -11,13 +11,8 @@ on:
 permissions:
   contents: write
 
-defaults:
-  run:
-    shell: bash
-    working-directory: ./docs
-
 jobs:
-  deploy:
+  deploy_docs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     steps:

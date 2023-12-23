@@ -24,6 +24,7 @@
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
+    "@catppuccin/palette": "^0.2.0",
     "@docusaurus/module-type-aliases": "3.0.1",
     "@docusaurus/tsconfig": "3.0.1",
     "@docusaurus/types": "3.0.1",

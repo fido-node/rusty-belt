@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+sidebar_label: "Update loop on server"
 ---
 
 # Markdown Features
@@ -43,19 +44,10 @@ Let's see how to [Create a page](./create-a-page.md).
 
 Regular Markdown images are supported.
 
-You can use absolute paths to reference images in the static directory (`static/img/docusaurus.png`):
 
-```md
-![Docusaurus logo](/img/docusaurus.png)
-```
-
-![Docusaurus logo](/img/docusaurus.png)
 
 You can reference images relative to the current file as well. This is particularly useful to colocate images close to the Markdown files using them:
 
-```md
-![Docusaurus logo](./img/docusaurus.png)
-```
 
 ## Code Blocks
 

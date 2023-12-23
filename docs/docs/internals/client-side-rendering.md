@@ -1,5 +1,7 @@
 ---
 sidebar_position: 5
+sidebar_label: "Rendering on client"
+
 ---
 
 # Deploy your site

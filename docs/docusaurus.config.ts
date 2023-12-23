@@ -5,10 +5,10 @@ import type * as Preset from "@docusaurus/preset-classic";
 const config: Config = {
   title: "Rusty Belt",
   tagline: "Rusty Belt is my very own replacement for powerline",
-  favicon: "img/favicon.ico",
+  // favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://your-docusaurus-site.example.com",
+  url: "https://rusty-belt.fidonode.me/",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -18,7 +18,7 @@ const config: Config = {
   organizationName: "fido-node", // Usually your GitHub org/user name.
   projectName: "rusty-belt", // Usually your repo name.
 
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internationalization, you can use this field to set
@@ -34,15 +34,16 @@ const config: Config = {
       "classic",
       {
         docs: {
+          routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/fido-node/rusty-belt/tree/main/docs/",
         },
         theme: {
           customCss: "./src/css/custom.css",
         },
+        blog: false,
       } satisfies Preset.Options,
     ],
   ],
@@ -51,21 +52,20 @@ const config: Config = {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
     navbar: {
-      title: "My Site",
-      logo: {
-        alt: "My Site Logo",
-        src: "img/logo.svg",
-      },
+      title: "Rusty Belt",
+      // logo: {
+      // alt: "My Site Logo",
+      // src: "img/logo.svg",
+      // },
       items: [
         {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
           position: "left",
-          label: "Tutorial",
+          label: "Docs",
         },
-        { to: "/blog", label: "Blog", position: "left" },
         {
-          href: "https://github.com/facebook/docusaurus",
+          href: "https://github.com/fido-node/rusty-belt",
           label: "GitHub",
           position: "right",
         },
@@ -78,8 +78,8 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Tutorial",
-              to: "/docs/intro",
+              label: "Install",
+              to: "/docs/install",
             },
           ],
         },

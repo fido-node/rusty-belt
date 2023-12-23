@@ -13,6 +13,9 @@ permissions:
 
 jobs:
   deploy_docs:
+    default:
+      run:
+        working-directory: ./docs
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     steps:

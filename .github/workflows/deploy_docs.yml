@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   deploy_docs:
-    default:
+    defaults:
       run:
         working-directory: ./docs
     name: Deploy to GitHub Pages

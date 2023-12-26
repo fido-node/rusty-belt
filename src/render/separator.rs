@@ -26,12 +26,12 @@ impl Separator<'_> {
         let first_color = if reverse {
             palet_iterator
                 .next()
-                .map(|s| format!("#{}", s))
+                .map(|s| s.clone())
                 .unwrap_or("default".to_string())
         } else {
             palet_iterator
                 .next()
-                .map(|s| format!("#{}", s))
+                .map(|s| s.clone())
                 .unwrap_or("default".to_string())
         };
         Separator {
@@ -53,7 +53,7 @@ impl Separator<'_> {
                 let color = self
                     .bg_colors
                     .next()
-                    .map(|s| format!("#{}", s))
+                    .map(|s| s.clone())
                     .unwrap_or(default_color.clone());
 
                 let r = (color.clone(), self.prev_bg_color.clone());
@@ -65,7 +65,7 @@ impl Separator<'_> {
             let color = self
                 .bg_colors
                 .next()
-                .map(|s| format!("#{}", s))
+                .map(|s| s.clone())
                 .unwrap_or(default_color.clone());
 
             let result = if is_edge {

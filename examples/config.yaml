@@ -4,20 +4,20 @@ server:
 segments:
   - name: left
     bg_palet:
-      - f5e0dc
-      - f5c2e7
-      - cba6f7
-      - eba0ac
-      - f9e2af
-      - a6e3a1
-      - 94e2d5
-      - 89dceb
-      - 89b4fa
-      - b4befe
+      - "#f5e0dc"
+      - "#f5c2e7"
+      - "#cba6f7"
+      - "#eba0ac"
+      - "#f9e2af"
+      - "#a6e3a1"
+      - "#94e2d5"
+      - "#89dceb"
+      - "#89b4fa"
+      - "#b4befe"
     fg_palet:
-      - 11111b
-      - 181825
-      - 1e1e2e
+      - "#11111b"
+      - "#181825"
+      - "#1e1e2e"
     separator: 
     parts:
       - type: session_name
@@ -58,20 +58,20 @@ segments:
         template: "{{v.stdout}}"
   - name: right
     bg_palet:
-      - f5e0dc
-      - f5c2e7
-      - cba6f7
-      - eba0ac
-      - f9e2af
-      - a6e3a1
-      - 94e2d5
-      - 89dceb
-      - 89b4fa
-      - b4befe
+      - "#f5e0dc"
+      - "#f5c2e7"
+      - "#cba6f7"
+      - "#eba0ac"
+      - "#f9e2af"
+      - "#a6e3a1"
+      - "#94e2d5"
+      - "#89dceb"
+      - "#89b4fa"
+      - "#b4befe"
     fg_palet:
-      - 11111b
-      - 181825
-      - 1e1e2e
+      - "#11111b"
+      - "#181825"
+      - "#1e1e2e"
     separator: 
     direction: rtl
     parts:

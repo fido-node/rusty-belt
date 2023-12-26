@@ -1,9 +1,10 @@
 [package]
 name = "rusty-belt"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 readme = "README.md"
 repository = "https://github.com/fido-node/rusty-belt"
+homepage = "https://rusty-belt.fidonode.me/"
 license-file = "LICENSE"
 authors = ["Aleksandr Mikhailov <iam@fidonode.me>"]
 description = "Application for collecting system information. Now you can show it in tmux status"

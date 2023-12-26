@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-sidebar_label: "Configure"
+sidebar_label: "Server"
 ---
 
 # Tutorial Intro

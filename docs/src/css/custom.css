@@ -5,6 +5,21 @@
  */
 @import "@catppuccin/palette/style";
 
+@font-face {
+  font-family: "VictorMonoNerdFont";
+  src:
+    url("../fonts/VictorMonoNerdFontMono.woff2") format("woff2"),
+    url("../fonts/VictorMonoNerdFontMono.ttf") format("truetype");
+  font-stretch: normal;
+  font-style: normal;
+  font-weight: 700;
+}
+
+code {
+  font-family: "VictorMonoNerdFont" !important;
+  font-size: 18px !important;
+}
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #2e8555;

@@ -1,0 +1,86 @@
+---
+sidebar_position: 2
+sidebar_label: "Linux"
+---
+import CodeBlock from '@theme/CodeBlock';
+import ServiceSource from '!!raw-loader!./../../../resources/rusty-belt.service';
+import ConfigExample from '!!raw-loader!./../../../examples/config.yaml';
+import LogExample from '!!raw-loader!./../../../examples/log4rs.yaml';
+
+## Requirements
+
+You need to install rustc and cargo. Yo can use **rustup** or your package manager for your system.
+
+### Cargo
+
+Install with cargo from **crates.io**
+
+```
+cargo install rusty-belt
+```
+
+### Build from source
+
+Clone repository
+
+```
+git clone https://github.com/fido-node/rusty-belt.git
+```
+
+Build binaries with release flag
+
+```
+cargo build --release
+```
+
+Move binaries from `./target/release/` to some dir in your `PATH`
+
+```
+cp ./target/release/tmux_client ~/.local/bin
+cp ./target/release/rusty_belt_server ~/.local/bin
+```
+
+### Run as a service
+
+You can use this file [**rusty-belt.service**](https://github.com/fido-node/rusty-belt/blob/main/resources/rusty-belt.service) for example: 
+
+Fix 7th line acording to the way you've installed binaries.  
+Use `/.cargo/bin/rusty_belt_server` if you choose cargo as source of binaries.  
+Use `/.local/bin/rusty_belt_server` if you build it from sources.  
+
+<CodeBlock 
+    language="systemd"
+    title="~/.config/systemd/user/rusty-belt.service"
+    showLineNumbers
+>{ServiceSource}</CodeBlock>
+
+Place it to the `~/.config/systemd/user/`
+
+Reload services, enable and start it.
+```
+systemctl daemon-reload --user
+systemctl --user enable rusty-belt.service
+systemctl --user start rusty-belt.service
+```
+
+### Use sample configs
+
+Use sample configs or go to [**configuration doc**](../category/configuration)
+
+Place these files to `~/.config/rusty-belt/`
+
+Sample app config:
+
+<CodeBlock
+    language="yaml"
+    title="~/.config/rusty-belt/config.yaml"
+    showLineNumbers
+>{ConfigExample}</CodeBlock>
+
+Sample logging config:
+
+<CodeBlock
+    language="yaml"
+    title="~/.config/rusty-belt/log4rs.yaml"
+    showLineNumbers
+>{LogExample}</CodeBlock>

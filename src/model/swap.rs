@@ -48,7 +48,7 @@ impl Model for Swap {
                         self.total = s.total;
                         let used_percents = (s.used as f64 / s.total as f64) * 100.0;
                         self.used_percents_series.push_back(used_percents);
-                        if self.used_percents_series.len() >= 8 {
+                        if self.used_percents_series.len() > 8 {
                             self.used_percents_series.pop_front();
                         }
                     }

@@ -37,7 +37,7 @@ impl Model for CPU {
                 CacheValue::Resources(stats) => {
                     for stat in stats.into_iter() {
                         self.consumption_series.push_back(stat.cpu.usage as f64);
-                        if self.consumption_series.len() >= 8 {
+                        if self.consumption_series.len() > 8 {
                             self.consumption_series.pop_front();
                         }
                     }

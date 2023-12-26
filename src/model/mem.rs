@@ -55,7 +55,7 @@ impl Model for Mem {
                         self.used = m.used;
                         let used_percents = (m.used as f64 / m.total as f64) * 100.0;
                         self.used_percents_series.push_back(used_percents);
-                        if self.used_percents_series.len() >= 8 {
+                        if self.used_percents_series.len() > 8 {
                             self.used_percents_series.pop_front();
                         }
                     }

@@ -1,0 +1,238 @@
+---
+sidebar_position: 2
+sidebar_label: "Client"
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import ConfigExample from '!!raw-loader!./../../../examples/config.yaml';
+
+# Client config breakout
+
+## What is handlebars?
+
+[Handlebars](https://handlebarsjs.com/) is a simple templating language.  
+Here I use [handlebars-rust](https://github.com/sunng87/handlebars-rust) implementation. I use handlebars to have a way to flexible render data structures into string templates.
+
+Example of rich template:
+```
+{{#if v}}󰖂 {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs{{/if}}
+```
+
+You can use handlebars [playground](https://handlebarsjs.com/playground.html) to play with templates.
+
+## Segments
+
+Segments mostly contains from `type` and `template` fields. Where type is a value from enumeration presented next and template is handlebars template string. Data structure passed to template stored in variable named `v`. Somewhere it is single value, in other segments it may be structure.
+`_grpah` variables in `v` is a string with a special characters which represents simple line graph analog. f.e. `▁▃▅▇▇▇█`
+
+Available segment types:
+ - [session_name](#session-name)
+ - [vpn](#vpn)
+ - [mem](#memory)
+ - [swap](#swap)
+ - [cpu](#cpu)
+ - [disk](#disk)
+ - [load_average](#load-average)
+ - [shell](#shell)
+ 
+### Session name
+
+Simple value with tmux session name in which status renders.
+
+Data payload for template:
+```rust
+let v: String;
+```
+
+Example:
+```yaml
+type: session_name
+template: ": {{v}}"
+```
+
+Renders to: `: MAIN`
+ 
+### VPN
+
+Data payload for template:
+```rust
+let v: Vec<String>;
+```
+
+Example:
+```yaml
+type: vpn
+template: "{{#if v}}󰖂: {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs connected.{{/if}}"
+names:
+    - substring_matcher: "10.154.1."
+      name: "prod"
+    - substring_matcher: "10.154.154."
+      name: "dev"
+```
+
+Renders to:
+ - When you have a connected network with IP address containing "10.154.1."  
+   `󰖂: prod`
+ - When you have a connected networks with IP address containing "10.154.1." and "10.154.154"   
+   `󰖂: prod, dev`
+ - When none of above found  
+   `No VPNs connected.`
+ 
+### Memory
+
+Data payload for template:
+```rust
+pub struct Memory {
+    pub total: String,
+    pub available: String,
+    pub used: String,
+    pub used_percents: String,
+    pub used_percents_graph: String,
+};
+
+let v: Memory;
+```
+
+Example:
+```yaml
+type: mem
+template: ": {{v.total}}/{{v.available}}/{{v.used}}"
+```
+Renders to: `: 32GB/22.84GB/8.33GB`
+
+```yaml
+type: mem
+template:  {{v.used_percents}}% {{v.used_percents_graph}}
+```
+Renders to: `: 27% ▃▃▃▃▃▃▃`
+ 
+### Swap
+
+Data payload for template:
+```rust
+pub struct Swap {
+    pub total: String,
+    pub used: String,
+    pub used_percents: String,
+    pub used_percents_graph: String,
+}
+
+let v: Swap;
+```
+
+Example:
+```yaml
+type: swap
+template: "Swap: {{v.total}}/{{v.used}}"
+```
+Renders to: `Swap: 8GB/1.22GB`
+ 
+
+```yaml
+type: swap
+template: "󰾴: {{v.used_percents}}% {{v.used_percents_graph}}"
+```
+Renders to: `󰾴: 13% ▁▁▁▁▁▁▁▁`
+ 
+ 
+### CPU
+
+Data payload for template:
+```rust
+pub struct CPU {
+    pub consumption: String,
+    pub consumption_graph: String,
+}
+
+let v: CPU;
+```
+
+Example:
+```yaml
+type: cpu
+template: ": {{v.consumption}}%"
+```
+
+Renders to: `: 22%`
+
+```yaml
+type: cpu
+template: ": {{v.consumption}}% {{v.consumption_graph}}"
+```
+
+Renders to: `: 99%  ▁▃▅▅▇▇▇█`
+ 
+
+### Disk
+
+Data payload for template:
+```rust
+pub struct DiskV {
+    pub mount_point: String,
+    pub device_path: String,
+    pub available_space: String,
+    pub total_space: String,
+    pub used_percents: String,
+}
+
+let v: Disk;
+```
+
+Example:
+```yaml
+type: disk
+dev: /dev/mapper/luks-7a504a5c-****-****-****-3a97c15a21ce
+template: "  {{v.mount_point}} {{v.available_space}}"
+```
+
+Renders to: `  / 623.26GB`
+ 
+### Load average
+
+Data payload for template:
+```rust
+pub struct LA {
+    pub one: String,
+    pub five: String,
+    pub fifteen: String,
+}
+
+let v: LA;
+```
+
+Example:
+```yaml
+type: load_average
+template: "LA: {{v.one}}, {{v.five}}, {{v.fifteen}}"
+```
+
+Renders to: `LA: 1.01, 1.00, 0.93`
+ 
+### Shell
+
+Data payload for template:
+```rust
+pub struct Shell {
+    pub stdout: String,
+}
+
+let v: Shell;
+```
+
+Example:
+```yaml
+type: shell
+cmd: free -m -h | awk '/Mem/{printf $3"/"$2}'
+template: "{{v.stdout}}"
+```
+
+Renders to: `8,5Gi/31Gi` (Result of command)
+ 
+
+## Color palets
+
+WIP
+
+## Separator
+
+WIP

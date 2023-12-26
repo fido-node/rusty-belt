@@ -3,46 +3,81 @@ sidebar_position: 3
 sidebar_label: "My daily config"
 ---
 
-# Tutorial Intro
+# My daily config of rusty-belt
 
-Let's discover **Docusaurus in less than 5 minutes**.
+### Requirements
+ - gitmux
 
-## Getting Started
 
-Get started by **creating a new site**.
+### Config
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
-
-### What you'll need
-
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
+```yaml title="~/.config/rusty-belt/config.yaml"
+---
+server:
+  update_interval: 1
+segments:
+  - name: left
+    bg_palette:
+      - "#f5e0dc"
+      - "#f5c2e7"
+      - "#cba6f7"
+      - "#eba0ac"
+      - "#f9e2af"
+      - "#a6e3a1"
+      - "#94e2d5"
+      - "#89dceb"
+      - "#89b4fa"
+      - "#b4befe"
+    fg_palette:
+      - "#11111b"
+      - "#181825"
+      - "#1e1e2e"
+    separator: 
+    direction: ltr
+    parts:
+      - type: session_name
+        template: " {{v}}"
+      - type: vpn
+        template: "{{#if v}}󰖂 {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs{{/if}}"
+        names:
+          - substring_matcher: "10.154.1."
+            name: "prod"
+          - substring_matcher: "10.154.154."
+            name: "dev"
+      - type: mem
+        template: " {{v.used_percents}}% {{v.used_percents_graph}}"
+      - type: cpu
+        template: " {{v.consumption}}% {{v.consumption_graph}}"
+  - name: right
+    bg_palette:
+      - "#f5e0dc"
+      - "#f5c2e7"
+      - "#cba6f7"
+      - "#eba0ac"
+      - "#f9e2af"
+      - "#a6e3a1"
+      - "#94e2d5"
+      - "#89dceb"
+      - "#89b4fa"
+      - "#b4befe"
+    fg_palette:
+      - "#11111b"
+      - "#181825"
+      - "#1e1e2e"
+    separator: 
+    direction: rtl
+    parts:
+      - type: disk
+        dev: /dev/mapper/luks-7a504a5c-****-****-****-3a97c15a21ce
+        template: "  {{v.mount_point}} {{v.available_space}}"
+      - type: shell
+        use_pwd: true
+        cmd: gitmux -cfg ~/.config/tmux/gitmux.yaml
+        template: "{{v.stdout}}"
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+### Screenshots
+![Screenshot](./../../resources/full_screenshot.png)
 
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+![GIF](./../../resources/cast.gif)

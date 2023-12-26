@@ -64,9 +64,9 @@ pub struct Segment {
     #[serde(default = "String::new")]
     pub separator: String,
     #[serde(default = "Vec::new")]
-    pub fg_palet: Vec<String>,
+    pub fg_palette: Vec<String>,
     #[serde(default = "Vec::new")]
-    pub bg_palet: Vec<String>,
+    pub bg_palette: Vec<String>,
     #[serde(default = "default_direction")]
     pub direction: String,
     pub parts: Vec<Part>,
@@ -323,7 +323,7 @@ pub mod parse {
             assert_eq!(app_config.segments[0].name, "left");
 
             // Assertions for parts in the first segment
-            assert_eq!(app_config.segments[0].fg_palet.len(), 3);
+            assert_eq!(app_config.segments[0].fg_palette.len(), 3);
             assert_eq!(app_config.segments[0].parts.len(), 10);
             assert_eq!(
                 app_config.segments[0].parts[0],

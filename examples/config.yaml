@@ -3,7 +3,7 @@ server:
   update_interval: 2
 segments:
   - name: left
-    bg_palet:
+    bg_palette:
       - "#f5e0dc"
       - "#f5c2e7"
       - "#cba6f7"
@@ -14,7 +14,7 @@ segments:
       - "#89dceb"
       - "#89b4fa"
       - "#b4befe"
-    fg_palet:
+    fg_palette:
       - "#11111b"
       - "#181825"
       - "#1e1e2e"
@@ -57,7 +57,7 @@ segments:
         cmd: free -m -h | awk '/Mem/{printf $3"/"$2}'
         template: "{{v.stdout}}"
   - name: right
-    bg_palet:
+    bg_palette:
       - "#f5e0dc"
       - "#f5c2e7"
       - "#cba6f7"
@@ -68,7 +68,7 @@ segments:
       - "#89dceb"
       - "#89b4fa"
       - "#b4befe"
-    fg_palet:
+    fg_palette:
       - "#11111b"
       - "#181825"
       - "#1e1e2e"

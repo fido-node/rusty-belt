@@ -26,9 +26,9 @@ pub fn render_response(response: belt::Response, config: &config::Segment) -> St
     let mut result = Vec::new();
     let mut styled_result = String::from("");
     let reverse = config.direction == "rtl".to_owned();
-    let mut separator_colorer = Separator::new(reverse, &config.bg_palet);
-    let mut fg_color_palet = palet_iterator(&config.fg_palet, reverse);
-    let mut bg_color_palet = palet_iterator(&config.bg_palet, reverse);
+    let mut separator_colorer = Separator::new(reverse, &config.bg_palette);
+    let mut fg_color_palet = palet_iterator(&config.fg_palette, reverse);
+    let mut bg_color_palet = palet_iterator(&config.bg_palette, reverse);
 
     let segments = &config.parts;
     let separator = &config.separator;

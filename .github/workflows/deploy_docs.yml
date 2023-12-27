@@ -39,7 +39,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          cname: rusty-belt.fidonode.me
           allow_empty_commit: true
           # Build output to publish to the `gh-pages` branch:
           publish_dir: ./docs/build

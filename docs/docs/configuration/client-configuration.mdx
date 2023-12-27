@@ -22,10 +22,16 @@ You can use handlebars [playground](https://handlebarsjs.com/playground.html) to
 
 ## Segments
 
-Segments mostly contains from `type` and `template` fields. Where type is a value from enumeration presented next and template is handlebars template string. Data structure passed to template stored in variable named `v`. Somewhere it is single value, in other segments it may be structure.
-`_grpah` variables in `v` is a string with a special characters which represents simple line graph analog. f.e. `▁▃▅▇▇▇█`
+Segment is a building block of client config. Config may have many segments. Example config has two segments. Each segment has `name` field. When you ask client to render something you should pass segment's name as CLI parameter `--segment-name`.  
+Each also segment have `direction` field affects how colors applied from `{fg,bg}_palette` and how `separator` works.  
+And the most complex part of segment is parts list.
 
-Available segment types:
+## Parts
+
+Part mostly contains from `type` and `template` fields. Where type is a value from enumeration presented next and template is handlebars template string. Data structure passed to template stored in variable named `v`. Somewhere it is single value, in other parts it may be structure.
+`_grpah` variables in `v` is a string with a special characters which represents simple line graph analog. f.e. `▁▃▅▇▇▇█`  
+
+Available part types:
  - [session_name](#session-name)
  - [vpn](#vpn)
  - [mem](#memory)
@@ -231,8 +237,9 @@ Renders to: `8,5Gi/31Gi` (Result of command)
 
 ## Color palets
 
-WIP
+There are color palette in each segment. It may be empty or it may be list of HEX colors. If your parts list is longer than palette, clinet will use palette again and again.
+If `direction` set to `ltr`, client will reverse palette. So basically you can use same palette in left and right segments, but two segments will consume palette from different sides.
 
 ## Separator
 
-WIP
+With separator you can replicate powerline theme. Just set symbol you want to see as separator and set correct direction for segment. Exapmple config has standart powerline separators ``

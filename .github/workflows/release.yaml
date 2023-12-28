@@ -16,13 +16,12 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v2
 
-
   publish-cargo:
     runs-on: self-hosted
     needs: setup
     steps:
       - name: Set version
-        run: BUILD_VERSION="${{ github.ref_name }}" awk -i inplace '/^version/ {sub(/^v/, "", ENVIRON["BUILD_VERSION"]); print "version = \"" ENVIRON["BUILD_VERSION"] "\""; next} 1' Cargo.toml
+        run: BUILD_VERSION="${{ github.ref_name }}" gawk -i inplace  '/^version/ {sub(/^v/, "", ENVIRON["BUILD_VERSION"]); print "version = \"" ENVIRON["BUILD_VERSION"] "\""; next} 1' Cargo.toml
       - name: Publish to cargo
         run: cargo publish --allow-dirty --token ${{ secrets.CARGO_LOGIN }}
 

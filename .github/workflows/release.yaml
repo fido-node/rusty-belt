@@ -22,7 +22,7 @@ jobs:
     needs: setup
     steps:
       - name: Set version
-        BUILD_VERSION="${{ github.ref_name }}" awk -i inplace '/^version/ {sub(/^v/, "", ENVIRON["BUILD_VERSION"]); print "version = \"" ENVIRON["BUILD_VERSION"] "\""; next} 1' Cargo.toml
+        run: BUILD_VERSION="${{ github.ref_name }}" awk -i inplace '/^version/ {sub(/^v/, "", ENVIRON["BUILD_VERSION"]); print "version = \"" ENVIRON["BUILD_VERSION"] "\""; next} 1' Cargo.toml
       - name: Publish to cargo
         run: cargo publish --allow-dirty --token ${{ secrets.CARGO_LOGIN }}
 

@@ -15,6 +15,7 @@ jobs:
         uses: arduino/setup-protoc@v2
 
   build-and-bundle-binaries:
+    needs: setup
     runs-on: self-hosted
     strategy:
       matrix:
@@ -30,18 +31,19 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: "${{contains(matrix.target, 'apple') && 'zip' || 'tar'}}"
-          directory: "target/${{ matrix.target }}/release"
+          path: "target/${{ matrix.target }}/release/"
           filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar.gz' }}"
-          exclusions: "build deps examples incremental *.d *.rlib"
+          exclusions: "build deps examples incremental *.d *.rlib .fingerprint .cargo-lock"
   publish-to-release:
     runs-on: self-hosted
+    needs: build-and-bundle-binaries
     steps:
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: |
-          target/x86_64-apple-darwin/release/rusty-belt-${{github.ref_name}}-x86_64-apple-darwin.zip
-          target/aarch64-apple-darwin/release/rusty-belt-${{github.ref_name}}-aarch64-apple-darwin.zip
-          target/x86_64-unknown-linux-musl/release/rusty-belt-${{github.ref_name}}-x86_64-unknown-linux-musl.tar.gz
-          target/aarch64-unknown-linux-musl/release/rusty-belt-${{github.ref_name}}-aarch64-unknown-linux-musl.tar.gz
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            rusty-belt-${{github.ref_name}}-x86_64-apple-darwin.zip
+            rusty-belt-${{github.ref_name}}-aarch64-apple-darwin.zip
+            rusty-belt-${{github.ref_name}}-x86_64-unknown-linux-musl.tar.gz
+            rusty-belt-${{github.ref_name}}-aarch64-unknown-linux-musl.tar.gz

@@ -2,36 +2,36 @@
 name: Release binaries
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
-  upload-assets:
-    strategy:
-      matrix:
-        include:
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
-          - target: aarch64-apple-darwin
-            os: macos-latest
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-          - target: x86_64-apple-darwin
-            os: macos-latest
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install cross-compilation tools
-        uses: taiki-e/setup-cross-toolchain-action@v1
-        with:
-          target: ${{ matrix.target }}
-        if: startsWith(matrix.os, 'ubuntu')
-      - uses: taiki-e/upload-rust-binary-action@v1
-        with:
-          # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
-          # Note that glob pattern is not supported yet.
-          bin: ...
-          # (optional) Target triple, default is host triple.
-          target: ${{ matrix.target }}
-          # (required) GitHub token for uploading assets to GitHub Releases.
-          token: ${{ secrets.GITHUB_TOKEN }}
+  runs-on: self-hosted
+  strategy:
+    matrix:
+      target:
+        - x86_64-apple-darwin
+        - aarch64-apple-darwin
+        - aarch64-unknown-linux-musl
+        - x86_64-unknown-linux-musl
+  steps:
+    - uses: actions/checkout@v4
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v2
+    - name: Build ${{ matrix.target }}
+      run: cargo build --release --target ${{ matrix.target }}
+    - name: Bundle ${{ matrix.target }}
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: contains(matrix.target, 'apple') && "zip" || "tar"
+        directory: "target/${{ matrix.target }}/release"
+        filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar' }}"
+        exclusions: "build deps examples incremental *.d *.rlib"
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          Release.txt
+          LICENSE

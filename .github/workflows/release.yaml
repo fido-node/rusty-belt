@@ -7,7 +7,14 @@ on:
       - "v*.*.*"
 
 jobs:
-  release-binaries:
+  setup:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+
+  build-and-bundle-binaries:
     runs-on: self-hosted
     strategy:
       matrix:
@@ -17,22 +24,23 @@ jobs:
           - aarch64-unknown-linux-musl
           - x86_64-unknown-linux-musl
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
       - name: Build ${{ matrix.target }}
         run: cargo build --release --target ${{ matrix.target }}
       - name: Bundle ${{ matrix.target }}
         uses: thedoctor0/zip-release@0.7.5
         with:
-          type: contains(matrix.target, 'apple') && "zip" || "tar"
+          type: "${{contains(matrix.target, 'apple') && 'zip' || 'tar'}}"
           directory: "target/${{ matrix.target }}/release"
-          filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar' }}"
+          filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar.gz' }}"
           exclusions: "build deps examples incremental *.d *.rlib"
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            Release.txt
-            LICENSE
+  publish-to-release:
+    runs-on: self-hosted
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          target/x86_64-apple-darwin/release/rusty-belt-${{github.ref_name}}-x86_64-apple-darwin.zip
+          target/aarch64-apple-darwin/release/rusty-belt-${{github.ref_name}}-aarch64-apple-darwin.zip
+          target/x86_64-unknown-linux-musl/release/rusty-belt-${{github.ref_name}}-x86_64-unknown-linux-musl.tar.gz
+          target/aarch64-unknown-linux-musl/release/rusty-belt-${{github.ref_name}}-aarch64-unknown-linux-musl.tar.gz

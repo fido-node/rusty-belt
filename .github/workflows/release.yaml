@@ -44,7 +44,7 @@ jobs:
           type: "${{contains(matrix.target, 'apple') && 'zip' || 'tar'}}"
           directory: "target/${{ matrix.target }}/release/"
           filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar.gz' }}"
-          exclusions: "build deps examples incremental *.d *.rlib .fingerprint .cargo-lock"
+          exclusions: "./build ./deps ./examples ./incremental *.d *.rlib ./.fingerprint ./.cargo-lock"
   publish-to-release:
     runs-on: self-hosted
     needs: build-and-bundle-binaries

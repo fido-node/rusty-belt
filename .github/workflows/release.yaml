@@ -39,12 +39,8 @@ jobs:
       - name: Build ${{ matrix.target }}
         run: cargo build --release --target ${{ matrix.target }}
       - name: Bundle ${{ matrix.target }}
-        uses: thedoctor0/zip-release@0.7.5
-        with:
-          type: "${{contains(matrix.target, 'apple') && 'zip' || 'tar'}}"
-          directory: "target/${{ matrix.target }}/release/"
-          filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar.gz' }}"
-          exclusions: "./build ./deps ./examples ./incremental *.d *.rlib ./.fingerprint ./.cargo-lock"
+        run: ./.github/compress.sh "target/${{ matrix.target }}/release" "rusty-belt-${{ github.ref_name }}-${{ matrix.target }}"
+
   publish-to-release:
     runs-on: self-hosted
     needs: build-and-bundle-binaries

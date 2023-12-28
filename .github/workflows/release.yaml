@@ -31,7 +31,7 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: "${{contains(matrix.target, 'apple') && 'zip' || 'tar'}}"
-          path: "target/${{ matrix.target }}/release/"
+          directory: "target/${{ matrix.target }}/release/"
           filename: "rusty-belt-${{github.ref_name}}-${{ matrix.target }}.${{ contains(matrix.target, 'apple') && 'zip' || 'tar.gz' }}"
           exclusions: "build deps examples incremental *.d *.rlib .fingerprint .cargo-lock"
   publish-to-release:

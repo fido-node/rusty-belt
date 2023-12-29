@@ -40,6 +40,9 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
       - name: Bundle ${{ matrix.target }}
         run: ./.github/compress.sh "target/${{ matrix.target }}/release" "rusty-belt-${{ github.ref_name }}-${{ matrix.target }}"
+      - name: Bundle ${{ matrix.target }} deb
+        run: TARGET="${{ matrix.target }} VERSION="${{github.ref_name}}" ./.github/deb_build.sh  ${TARGET%%-*} "target/${{ matrix.target }}/release" ${VERSION#v}
+        if: ${{ contains(matrix.target, 'linux-musl') }}
 
   publish-to-release:
     runs-on: self-hosted
@@ -55,3 +58,5 @@ jobs:
             rusty-belt-${{github.ref_name}}-aarch64-apple-darwin.zip
             rusty-belt-${{github.ref_name}}-x86_64-unknown-linux-musl.tar.gz
             rusty-belt-${{github.ref_name}}-aarch64-unknown-linux-musl.tar.gz
+            rusty-belt-aarch64-${{github.ref_name}}.deb
+            rusty-belt-x86_64-${{github.ref_name}}.deb

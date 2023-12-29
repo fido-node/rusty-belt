@@ -7,9 +7,10 @@ DESCRIPTION="Rust replacement for tmux powerline"
 
 AARCH="$1"
 BINARY_PATH="$2"
+VERSION="$3"
 
 # Create package directory
-PACKAGE_DIR="${PACKAGE_NAME}_${AARCH}"
+PACKAGE_DIR="${PACKAGE_NAME}-${AARCH}-v${VERSION}"
 mkdir -p "$PACKAGE_DIR/DEBIAN"
 
 # Create control file
@@ -18,6 +19,7 @@ Package: $PACKAGE_NAME
 Architecture: $AARCH
 Maintainer: $MAINTAINER
 Description: $DESCRIPTION
+Version: $VERSION
 EOF
 
 # Create install file

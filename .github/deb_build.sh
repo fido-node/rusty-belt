@@ -20,6 +20,7 @@ Architecture: $AARCH
 Maintainer: $MAINTAINER
 Description: $DESCRIPTION
 Version: $VERSION
+
 EOF
 
 # Create install file

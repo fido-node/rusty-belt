@@ -24,7 +24,7 @@ pub fn handle_file_presence(pb: &PathBuf) -> Result<(), Box<dyn Error>> {
                 Ok(())
             } else {
                 Err(Box::<dyn Error>::from(format!(
-                    "Can't find file. Expect it here: \n {}",
+                    "Can't find file. Expect to see it here: {}",
                     pb.as_path().display()
                 )))
             }

@@ -2,7 +2,7 @@ use clap::Parser;
 use rusty_belt::args::CliArgs;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
-use rusty_belt::fs::{get_config_path, handle_file_presence};
+use rusty_belt::fs::{get_config_path, get_data_path, handle_file_presence};
 use rusty_belt::io::cli_client::CliClient;
 use rusty_belt::protocol::rusty::belt::{self};
 use rusty_belt::render::render_response;
@@ -18,6 +18,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = CliArgs::parse();
 
     let config_folder = get_config_path().ok_or_else(|| "Can't find path for config")?;
+
+    let mut socket_path = get_data_path().ok_or_else(|| "Can't find path for socket")?;
+    socket_path.push("server.socket");
+
+    let socket_file = socket_path.as_path().display().to_string();
 
     let mut config_file = config_folder.clone();
     config_file.push("config.yaml");
@@ -63,9 +68,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     request.segment_name = args.segment_name;
     request.context = Some(belt::request::Context::Tmux(request_context));
 
-    let addr = env!("HOME").to_string() + "/.local/share/rusty-belt.socket";
-
-    let cli_client = CliClient::new(addr);
+    let cli_client = CliClient::new(socket_file);
 
     if let Ok(response) = cli_client.make_request(request).await {
         let part_str = render_response(response, segment_conf);

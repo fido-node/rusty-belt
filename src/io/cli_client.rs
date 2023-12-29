@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::protocol::{
     codec::{RequestCodec, ResponseCodec},
     rusty::belt,

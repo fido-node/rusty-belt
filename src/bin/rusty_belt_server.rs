@@ -2,7 +2,7 @@ use clap::Parser;
 use log::debug;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
-use rusty_belt::fs::{get_config_path, handle_file_presence};
+use rusty_belt::fs::{get_config_path, get_data_path, handle_file_presence};
 use rusty_belt::model::{Model, ModelHelper};
 
 use rusty_belt::args::ServerArgs;
@@ -19,6 +19,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = ServerArgs::parse();
 
     let config_folder = get_config_path().ok_or_else(|| "Can't find path for config")?;
+
+    let mut socket_path = get_data_path().ok_or_else(|| "Can't find path for socket")?;
+    socket_path.push("server.socket");
+
+    let socket_file = socket_path.as_path().display().to_string();
 
     let mut config_file = config_folder.clone();
     config_file.push("config.yaml");
@@ -55,19 +60,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         })
         .collect();
 
-    debug!("models = {:?}", models);
     let mut state = State::default();
     state.set_segments(models);
     let arc_state = Arc::new(state);
 
-    debug!("Conf: {:?}", config);
-
     let rehydrator = Rehydrator::new(arc_state.clone());
     rehydrator.spawn_rehydration_task();
 
-    let addr = env!("HOME").to_string() + "/.local/share/rusty-belt.socket";
-
-    let server = Server::new(arc_state.clone(), addr);
+    let server = Server::new(arc_state.clone(), socket_file);
     server.run().await;
     Ok(())
 }

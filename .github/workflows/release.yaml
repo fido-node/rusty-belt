@@ -44,7 +44,7 @@ jobs:
         run: |
           TARGET="${{ matrix.target }}" TARGET="${TARGET%%-*}" \
           VERSION="${{github.ref_name}}" VERSION="${VERSION#v}" \
-          ./.github/deb_build.sh  $TARGET "target/${{ matrix.target }}/release" $VERSION
+          ./.github/deb_build.sh  "$TARGET" "target/${{ matrix.target }}/release" "$VERSION"
         if: ${{ contains(matrix.target, 'linux-musl') }}
 
   publish-to-release:

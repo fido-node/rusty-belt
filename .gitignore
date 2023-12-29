@@ -1,3 +1,5 @@
 /target
 ./config.yaml
 ./log4rs.yaml
+.DS_Store
+

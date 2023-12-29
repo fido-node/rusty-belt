@@ -41,7 +41,7 @@ jobs:
       - name: Bundle ${{ matrix.target }}
         run: ./.github/compress.sh "target/${{ matrix.target }}/release" "rusty-belt-${{ github.ref_name }}-${{ matrix.target }}"
       - name: Bundle ${{ matrix.target }} deb
-        run: TARGET="${{ matrix.target }} VERSION="${{github.ref_name}}" ./.github/deb_build.sh  ${TARGET%%-*} "target/${{ matrix.target }}/release" ${VERSION#v}
+        run: TARGET="${{ matrix.target }}" VERSION="${{github.ref_name}}" ./.github/deb_build.sh  ${TARGET%%-*} "target/${{ matrix.target }}/release" ${VERSION#v}
         if: ${{ contains(matrix.target, 'linux-musl') }}
 
   publish-to-release:

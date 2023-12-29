@@ -2,7 +2,7 @@ use clap::Parser;
 use rusty_belt::args::CliArgs;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
-use rusty_belt::fs::get_config_path;
+use rusty_belt::fs::{get_config_path, handle_file_presence};
 use rusty_belt::io::cli_client::CliClient;
 use rusty_belt::protocol::rusty::belt::{self};
 use rusty_belt::render::render_response;
@@ -17,9 +17,9 @@ use std::error::Error;
 async fn main() -> Result<(), Box<dyn Error>> {
     let args = CliArgs::parse();
 
-    let config_folder = get_config_path();
+    let config_folder = get_config_path().ok_or_else(|| "Can't find path for config")?;
 
-    let mut config_file = PathBuf::from(config_folder.clone());
+    let mut config_file = config_folder.clone();
     config_file.push("config.yaml");
 
     let mut log_config_file = PathBuf::from(config_folder.clone());
@@ -31,13 +31,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
         config_file
     };
 
-    log4rs::init_file(
-        args.log_config_path
-            .map(|cp| PathBuf::from(cp))
-            .unwrap_or(log_config_file),
-        Default::default(),
-    )
-    .unwrap();
+    handle_file_presence(&path_to_config)?;
+
+    let path_to_log = args
+        .log_config_path
+        .map(|cp| PathBuf::from(cp))
+        .unwrap_or(log_config_file);
+
+    handle_file_presence(&path_to_log)?;
+
+    log4rs::init_file(path_to_log, Default::default()).unwrap();
 
     let config: AppConfig = parse_config(&path_to_config);
     let segment_conf = config

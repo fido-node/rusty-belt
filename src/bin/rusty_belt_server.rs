@@ -2,7 +2,7 @@ use clap::Parser;
 use log::debug;
 use rusty_belt::config::parse::parse_config;
 use rusty_belt::config::AppConfig;
-use rusty_belt::fs::get_config_path;
+use rusty_belt::fs::{get_config_path, handle_file_presence};
 use rusty_belt::model::{Model, ModelHelper};
 
 use rusty_belt::args::ServerArgs;
@@ -10,16 +10,17 @@ use rusty_belt::io::server::Server;
 use rusty_belt::state::rehydrator::Rehydrator;
 use rusty_belt::state::State;
 use std::collections::HashMap;
+use std::error::Error;
 use std::path::PathBuf;
 use std::sync::Arc;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn Error>> {
     let args = ServerArgs::parse();
 
-    let config_folder = get_config_path();
+    let config_folder = get_config_path().ok_or_else(|| "Can't find path for config")?;
 
-    let mut config_file = PathBuf::from(config_folder.clone());
+    let mut config_file = config_folder.clone();
     config_file.push("config.yaml");
 
     let mut log_config_file = PathBuf::from(config_folder.clone());
@@ -31,13 +32,16 @@ async fn main() {
         config_file
     };
 
-    log4rs::init_file(
-        args.log_config_path
-            .map(|cp| PathBuf::from(cp))
-            .unwrap_or(log_config_file),
-        Default::default(),
-    )
-    .unwrap();
+    handle_file_presence(&path_to_config)?;
+
+    let path_to_log = args
+        .log_config_path
+        .map(|cp| PathBuf::from(cp))
+        .unwrap_or(log_config_file);
+
+    handle_file_presence(&path_to_log)?;
+
+    log4rs::init_file(path_to_log, Default::default()).unwrap();
 
     let config: AppConfig = parse_config(&path_to_config);
     let models: HashMap<String, Vec<Box<dyn Model>>> = config
@@ -65,4 +69,5 @@ async fn main() {
 
     let server = Server::new(arc_state.clone(), addr);
     server.run().await;
+    Ok(())
 }

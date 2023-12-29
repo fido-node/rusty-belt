@@ -31,6 +31,7 @@ lazy_static = "1.4.0"
 mockall = "0.11.4"
 handlebars = "4.5.0"
 systemstat = "0.2.3"
+dirs = "5.0.1"
 
 [build-dependencies]
 prost-build = "0.12"

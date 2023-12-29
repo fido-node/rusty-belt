@@ -28,15 +28,18 @@ impl DefaultExecutor {
 
 impl CommandExecutor for DefaultExecutor {
     fn execute(&self, cmd: &str, current_directory: Option<String>) -> String {
-        let command = Command::new("sh")
+        Command::new("sh")
             .arg("-c")
             .arg(cmd)
             .current_dir(current_directory.unwrap_or(env!("HOME").to_string()))
             .output()
-            .expect("failed to execute process");
-
-        let str = String::from_utf8(command.stdout).expect("failed to convert stdout to String");
-        str.trim().to_string()
+            .map_err(|e| Err::<String, String>(format!("{:#}", e)))
+            .and_then(|p| {
+                String::from_utf8(p.stdout)
+                    .map_err(|e| Err(format!("{:#}", e)))
+                    .map(|s| s.trim().to_string())
+            })
+            .unwrap_or("".to_string())
     }
 }
 

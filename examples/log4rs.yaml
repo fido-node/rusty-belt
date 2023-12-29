@@ -4,6 +4,6 @@ appenders:
   stdout:
     kind: console
 root:
-  level: debug
+  level: error
   appenders:
     - stdout

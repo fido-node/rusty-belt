@@ -1,0 +1,121 @@
+---
+sidebar_position: 2
+sidebar_label: "Manual Installation"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+import CodeBlock from '@theme/CodeBlock';
+import ConfigExample from '!!raw-loader!./../../../examples/config.yaml';
+import LogExample from '!!raw-loader!./../../../examples/log4rs.yaml';
+
+import SystemctlUnit from '!!raw-loader!./../../../resources/rusty-belt.service'
+import LaunchctlPlist from '!!raw-loader!./../../../resources/launched.dev.fidonode.me.rusty_belt_server.plist'
+
+
+## Requirements
+
+You need to install rustc and cargo. You can use **rustup** or your package manager for your system.
+Also you need protobuf.
+
+## Build from source
+
+Clone repository
+
+```
+git clone https://github.com/fido-node/rusty-belt.git
+```
+
+Build binaries with release flag
+
+```
+cargo build --release
+```
+
+Move binaries from `./target/release/` to some dir in your `PATH`
+
+```
+cp ./target/release/tmux_client ~/.local/bin
+cp ./target/release/rusty_belt_server ~/.local/bin
+```
+
+## Configs
+
+Use sample configs or go to [**configuration doc**](../category/configuration)
+
+<Tabs groupId="operating-systems">
+  <TabItem value="linux" label="Linux" default>
+    Create folder for cofigs `mkdir -p ~/.config/rusty-belt`
+    Place these files to `~/.config/rusty-belt/`
+  </TabItem>
+  <TabItem value="apple" label="Apple">
+    Create folder for configs `mkdir -p ~/Library/Application\ Support/rusty-belt/`
+    Place these files to `~/Library/Application\ Support/rusty-belt/`
+  </TabItem>
+</Tabs>
+
+
+
+Sample app config:
+
+<CodeBlock
+    language="yaml"
+    title="config.yaml"
+    showLineNumbers
+>{ConfigExample}</CodeBlock>
+
+Sample logging config:
+
+<CodeBlock
+    language="yaml"
+    title="log4rs.yaml"
+    showLineNumbers
+>{LogExample}</CodeBlock>
+
+## Run as service
+
+<Tabs groupId="operating-systems">
+  <TabItem value="linux" label="Linux" default>
+    You can use this file
+    [**rusty-belt.service**](https://github.com/fido-node/rusty-belt/blob/main/resources/rusty-belt.service) as example:
+
+
+    Fix 7th line acording to the way you've installed binaries.  
+    F.e. use `/.local/bin/rusty_belt_server`.  
+
+    <CodeBlock
+      language="systemd"
+      title="~/.config/systemd/user/rusty-belt.service"
+      showLineNumbers
+    >{SystemctlUnit}</CodeBlock>
+
+    Place it to the `~/.config/systemd/user/`
+
+    Reload services, enable and start it.
+    ```
+    systemctl daemon-reload --user
+    systemctl --user enable rusty-belt.service
+    systemctl --user start rusty-belt.service
+    ```
+
+  </TabItem>
+  <TabItem value="apple" label="Apple">
+
+    You can use this file
+    [**launched.dev.fidonode.me.rusty_belt_server.plist**](https://github.com/fido-node/rusty-belt/blob/main/resources/launched.dev.fidonode.me.rusty_belt_server.plist) as example:
+
+    <CodeBlock
+      language="systemd"
+      title="~/Library/LaunchAgents/launched.dev.fidonode.me.rusty_belt_server.plist"
+      showLineNumbers
+    >{LaunchctlPlist}</CodeBlock>
+
+    Place it to the `~/Library/LaunchAgents/`
+
+    Load services.
+    ```
+    launchctl load ~/Library/LaunchAgents/launched.dev.fidonode.me.rusty_belt_server.plist
+    ```
+
+  </TabItem>
+</Tabs>

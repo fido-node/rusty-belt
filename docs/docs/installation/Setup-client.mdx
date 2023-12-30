@@ -1,0 +1,16 @@
+---
+sidebar_position: 10
+sidebar_label: "Setup Client"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+## Tmux
+
+
+Set status variables in your tmux config.
+```
+set -g status-right "#(tmux_client --segment-name=right)"
+set -g status-left "#(tmux_client --segment-name=left)"
+```

@@ -19,6 +19,18 @@ Client-server implementation of tmux statuses
  - Weather info
  - Battery status
 
+# Install
+
+```
+cargo install rusty-belt
+```
+
+or
+
+```
+brew install fido-node/homebrew-barleywine/rusty-belt
+```
+
 # Further reading
 [Documentation](https://rusty-belt.fidonode.me/)
 

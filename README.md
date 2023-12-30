@@ -13,8 +13,9 @@ Client-server implementation of tmux statuses
  - Show tmux session
 
 # WIP features
- - Docs
- - Mac os brew build and instructions
+ ~~- Docs~~
+ ~~- Mac os brew build and instructions~~
+ - Autoreload config
  - Show current media status (artist/track/play/pause)
  - Weather info
  - Battery status

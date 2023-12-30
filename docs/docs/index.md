@@ -7,6 +7,8 @@ sidebar_label: "Intro"
 
 # Rusty Belt
 
+![Screenshot wiht default cofig](./../../resources/default_config_screenshot.png)
+
 Yet another one powerline for tmux.
 
 ## Y tho?
@@ -24,4 +26,5 @@ This one have client and server parts. Server collects information about system,
  - Run shell commands with current PWD and without
  - Find and show connectes networks. (may be usefull for enumerating connected VPNs)
  - Show tmux session
+ 
 

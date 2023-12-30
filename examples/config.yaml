@@ -21,41 +21,16 @@ segments:
     separator: 
     parts:
       - type: session_name
-        # Where v is string value with session name
         template: ": {{v}}"
-      - type: vpn
-        # Where v is a Vec of strings
-        template: "{{#if v}}󰖂: {{#each v}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}No VPNs connected.{{/if}}"
-        names:
-          - substring_matcher: "10.154.1."
-            name: "prod"
-          - substring_matcher: "10.154.154."
-            name: "dev"
       - type: mem
-        # Where v is a structure with humanized string fields 'used', 'available', 'total' and 'used_percents'
-        template: ": {{v.total}}/{{v.available}}/{{v.used}}"
-      - type: mem
-        # Where v is a structure with humanized string fields 'used', 'available', 'total' and 'used_percents'
-        template: "Mem: {{v.used_percents}}% {{v.used_percents_graph}}"
+        template: ": {{v.total}}/{{v.available}}/{{v.used}} {{v.used_percents}}% {{v.used_percents_graph}}"
       - type: cpu
         # Where v is a string value without percent symbol
-        template: ": {{v.consumption}}%"
-      - type: load_average
-        # Where v is a structure with humanized string fields 'one', 'five' and 'fifteen'
-        template: "LA: {{v.one}}, {{v.five}}, {{v.fifteen}}"
-      - type: swap
-        # Where v is a structure with humanized string fields 'used', 'total' and 'used_percents'
-        template: "Swap: {{v.total}}/{{v.used}}"
-      - type: swap
-        # Where v is a structure with humanized string fields 'used', 'total' and 'used_percents'
-        template: "󰾴: {{v.used_percents}}%"
+        template: ": {{v.consumption}}% {{v.consumption_graph}}"
       - type: disk
         dev: /dev/mapper/luks-7a504a5c-d5f0-4175-95b6-3a97c15a21ce
         # Where v is a structure with
         template: " {{v.mount_point}} {{v.used_percents}}%"
-      - type: shell
-        cmd: free -m -h | awk '/Mem/{printf $3"/"$2}'
-        template: "{{v.stdout}}"
   - name: right
     bg_palette:
       - "#f5e0dc"
@@ -75,7 +50,5 @@ segments:
     separator: 
     direction: rtl
     parts:
-      - type: shell
-        use_pwd: true
-        cmd: gitmux -cfg ~/.config/tmux/gitmux.yaml
-        template: "{{v.stdout}}"
+      - type: load_average
+        template: "LA: {{v.one}}, {{v.five}}, {{v.fifteen}}"

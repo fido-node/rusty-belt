@@ -12,6 +12,9 @@ keywords = ["cli", "tmux", "status"]
 categories = ["command-line-utilities"]
 include = ["/src", "README.md", "/examples", "LICENSE", "build.rs"]
 
+[package.scripts]
+post-install = "echo 'Please check documentation @ https://rusty-belt.fidonode.me/'"
+
 [dependencies]
 clap = { version = "4.4.8", features = ["derive", "env", "unicode"] }
 serde = { version = "1.0", features = ["derive"] }

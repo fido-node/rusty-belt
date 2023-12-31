@@ -5,6 +5,7 @@ edition = "2021"
 readme = "README.md"
 repository = "https://github.com/fido-node/rusty-belt"
 homepage = "https://rusty-belt.fidonode.me/"
+documentation = "https://rusty-belt.fidonode.me/"
 license-file = "LICENSE"
 authors = ["Aleksandr Mikhailov <iam@fidonode.me>"]
 description = "Application for collecting system information. Now you can show it in tmux status"
@@ -12,8 +13,6 @@ keywords = ["cli", "tmux", "status"]
 categories = ["command-line-utilities"]
 include = ["/src", "README.md", "/examples", "LICENSE", "build.rs"]
 
-[package.scripts]
-post-install = "echo 'Please check documentation @ https://rusty-belt.fidonode.me/'"
 
 [dependencies]
 clap = { version = "4.4.8", features = ["derive", "env", "unicode"] }

@@ -29,6 +29,14 @@ const config: Config = {
     locales: ["en"],
   },
 
+  scripts: [
+    {
+      src: "https://umami.dokutsu.xyz/script.js",
+      async: true,
+      "data-website-id": "028f81fa-0474-486a-9732-5064e224d6f2",
+    },
+  ],
+
   presets: [
     [
       "classic",
